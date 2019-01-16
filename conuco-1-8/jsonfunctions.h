@@ -357,7 +357,8 @@ void ICACHE_FLASH_ATTR parseJsonConf()
   conf.tipoED[1]=extrae(true,msg,PSTR("et1")).toInt();
   conf.iftttpinED[0]=extrae(false,msg,PSTR("ife0")).toInt();
   conf.iftttpinED[1]=extrae(false,msg,PSTR("ife1")).toInt();
-  extrae(true,msg, PSTR("s0")).toCharArray(auxdesc,20); savedescr(filedesclocal,auxdesc, 6,20);
+//  extrae(true,msg, PSTR("s0")).toCharArray(auxdesc,20); savedescr(filedesclocal,auxdesc, 6,20);
+  extrae(true,msg, idpin[0]).toCharArray(auxdesc,20); savedescr(filedesclocal,auxdesc, 6,20);
   extrae(true,msg, PSTR("s1")).toCharArray(auxdesc,20); savedescr(filedesclocal,auxdesc, 7,20);
   conf.valinic[0]=extrae(false,msg,PSTR("vi0")).toInt();
   conf.valinic[1]=extrae(false,msg,PSTR("vi1")).toInt();

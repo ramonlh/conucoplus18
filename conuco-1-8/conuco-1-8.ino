@@ -36,8 +36,6 @@ extern "C" {
 #include <FS.h>
 #include <ESP8266FtpServer.h>
 #include <PubSubClient.h>
-//#include "Adafruit_MQTT.h"
-//#include "Adafruit_MQTT_Client.h"
 
 ADC_MODE(ADC_TOUT);
 ESP8266WebServer server(88);
@@ -54,8 +52,6 @@ DHTesp dht[2];
 FtpServer ftpSrv;   //set #define FTP_DEBUG in ESP8266FtpServer.h to see ftp verbose on serial
 WiFiClient espClient;
 PubSubClient PSclient(espClient);
-char msgmqtt[50];
-int testvalue=0;
 #include "basicfunctions.h"            // include
 #include "ajaxcode.h"                  // include
 #include "htmlFunctions.h"             // include
@@ -265,7 +261,7 @@ int ICACHE_FLASH_ATTR pinvalR(byte ip, int port, byte pin, byte valor) // ejecut
 {
   createhost(hostraiz,conf.netseg,ip);
   msg=vacio;
-  printP(barra, valor?on:off, interr, letrap, ig, itoa(pin + 12, buff, 10));
+  printP(barra, valor?on:off, interr, letrap, ig, itoa(pin+12,buff,10));
   printP(amper, letrar, ig, itoa(conf.iddevice, buff, 10));
 
 //  HTTPClient http;
@@ -1606,6 +1602,7 @@ void ICACHE_FLASH_ATTR setupDevHTML()
       else if (param_number == 6) { conf.TempDesactPrg = server.arg(i).toInt(); } // seg. desact. prog.
       else if (param_number == 8) { server.arg(i).toCharArray(conf.aliasdevice, sizeof(conf.aliasdevice)); } // aliasdevice
       else if (param_number == 9) { conf.peractrem = server.arg(i).toInt(); }  // Per. actualización remotos
+      else if (param_number == 10) { server.arg(i).toCharArray(conf.instname, server.arg(i).length()+1); }  // instname
       else if (param_number == 14) { conf.modoterm=server.arg(i).toInt(); if (conf.modoterm==1) { conf.tempdefact[0]=0; conf.tempdefdes[0]=0; }}  // modo termostato
       else if (param_number == 15) { conf.latitud = server.arg(i).toFloat();  }
       else if (param_number == 16) { conf.longitud = server.arg(i).toFloat(); }
@@ -1623,12 +1620,14 @@ void ICACHE_FLASH_ATTR setupDevHTML()
   writeMenu(3, 0);
   writeForm(sdhtm);
 
-  printP(tr, td, t(dispositivo), barraesp, alias, td_f);
-  printP(td);
-  printcampoCB(0, conf.iddevice, 150, 166);
+  printP(tr, td, t(instalacion),barraesp);
+  printP(alias, barraesp,t(dispositivo), td_f,td);
+  printcampoC(10, conf.instname, 10, true, true, false);
+  printP(td_f,td);
+  printcampoC(8, conf.aliasdevice, 10, true, true, false);
   printP(td_f);
   printColspan(2);
-  printcampoC(8, conf.aliasdevice, 20, true, true, false);
+  printcampoCB(0, conf.iddevice, 150, 166);
   printP(td_f, tr_f);
 
   printP(tr, td, t(Modo),b);
@@ -1669,7 +1668,8 @@ void ICACHE_FLASH_ATTR setupDevHTML()
 
   printP(tr, td, href_i, comillas, http, gmaps);
   printP(comillas, b, newpage, mayor);
-  printP(t(latitudt), barraesp, t(longitudt), href_f, td_f, td);
+  printP(t(latitudt), barraesp);
+  printP(t(longitudt), href_f, td_f, td);
   printcampoF(15, conf.latitud, 6);
   printP(td_f, td);
   printcampoF(16, conf.longitud, 6);
@@ -1827,17 +1827,13 @@ void ICACHE_FLASH_ATTR setupNetServHTML()
   mp=1;
   if (server.method() == HTTP_POST)
   {
-    conf.mododweet = 0; conf.iftttenable = 0; conf.modomyjson = 0; conf.iottweetenable = 0;
+    conf.mododweet=0; conf.iftttenable=0; conf.modomyjson=0; 
+    conf.ftpenable=0; conf.mqttenable=0; conf.iottweetenable=0;
     for (int i=0; i<server.args(); i++)
-    {
+      {
       calcindices(i);
-      if (param_number==0)
-        {
-        conf.iddevice = server.arg(i).toInt(); // núm. dispositivo
-        conf.EEip[3] = conf.iddevice;
-        strcpy(conf.ssidAP, CONUCO); strcat(conf.ssidAP, subray); strcat(conf.ssidAP, itoa(conf.iddevice, buff, 10));
-        }
-      else if (param_number==1) { server.arg(i).toCharArray(conf.hostmyip, 30); }
+      if (param_number==0) { server.arg(i).toCharArray(conf.hostmyip, 30); }
+      else if (param_number==1) { conf.ftpenable=server.arg(i).toInt();  } // ftp server enabled      }
       else if (param_number==2) { conf.iftttenable=server.arg(i).toInt(); } // enable IFTTT
       else if (param_number==3) { server.arg(i).toCharArray(conf.iftttkey, 30); }
       else if (param_number==4) { conf.mododweet=server.arg(i).toInt(); }   // modo Dweet.io
@@ -1845,8 +1841,10 @@ void ICACHE_FLASH_ATTR setupNetServHTML()
       else if (param_number==6) { conf.iottweetenable=server.arg(i).toInt();  } // iottweet enabled      }
       else if (param_number==7) { server.arg(i).toCharArray(conf.iottweetuser, 10); }
       else if (param_number==8) { server.arg(i).toCharArray(conf.iottweetkey, 15);  }
-      else if (param_number==9) { conf.ftpenable=server.arg(i).toInt();  } // ftp server enabled      }
-    }
+      else if (param_number==9) { conf.mqttenable=server.arg(i).toInt(); } // enable MQTT
+      else if (param_number==10) { server.arg(i).toCharArray(conf.mqttserver, 40);  }
+      else if (param_number>=11) { server.arg(i).toCharArray(conf.mqttpath[param_number-11], 10);  }
+      }
     saveconf();
     sendOther(snshtm,-1);
     return;
@@ -1858,8 +1856,12 @@ void ICACHE_FLASH_ATTR setupNetServHTML()
 
   printP(tr, td, t(ippubserver), td_f, td, td_f);
   printColspan(2);
-  printcampoC(1, conf.hostmyip, 30, true, true, false);
+  printcampoC(0, conf.hostmyip, 30, true, true, false);
   printP(td_f, tr_f);
+
+  printP(tr,td,t(ftpserver),td_f,td);
+  checkBox(1, conf.ftpenable);
+  printP(td_f,td_if,td_if,tr_f);
 
   printP(tr, td, href_i, comillas, https, iftttcom);
   printP(comillas, b, newpage, mayor);
@@ -1909,21 +1911,33 @@ void ICACHE_FLASH_ATTR setupNetServHTML()
   printP(Key, href_f, td_f, conf.iottweetenable == 1 ? th : td);
   checkBox(6, conf.iottweetenable);
   printP(conf.iottweetenable==1?th_f:td_f,td);
-  if (clientremote())
-    printP(hidden);
-  else
-    printcampoC(7, conf.iottweetuser, 10, true, true, false);
+  if (clientremote()) printP(hidden); else printcampoC(7, conf.iottweetuser, 10, true, true, false);
   printP(td_f, td);
-  if (clientremote())
-    printP(hidden);
-  else
-    printcampoC(8, conf.iottweetkey, 15, true, true, false);
+  if (clientremote()) printP(hidden); else printcampoC(8, conf.iottweetkey, 15, true, true, false);
   printP(td_f, tr_f);
 
-  printP(tr,td,t(ftpserver),td_f,td);
-  checkBox(9, conf.ftpenable);
-  printP(td_f,td_if,td_if,tr_f);
-
+  printP(tr,td,mqtt,b,tserver,td_f);
+  printP(td);
+  checkBox(9, conf.mqttenable);
+  printP(td_f);
+  printColspan(2);
+  printcampoC(10, conf.mqttserver, 40, true, true, false);
+  printP(td_f,tr_f);
+  
+  for (byte i=0;i<3;i++)
+    {
+    printP(tr);
+    printColspan(2);
+    if (i==0) printP(mqtt,b,path);
+    printP(td_f,td);
+//    printcampoC(11+(i*2), conf.mqttpath[i*2], 10, true, (i*2>=6), false);
+    printcampoC(11+(i*2), conf.mqttpath[i*2], 10, true, true, false);
+    printP(barra,td_f,td);
+//    printcampoC(12+(i*2), conf.mqttpath[i*2+1], 10, true, (i*2>=6), false);
+    printcampoC(12+(i*2), conf.mqttpath[i*2+1], 10, true, true, false);
+    printP(barra,td_f,tr_f); 
+    }
+  
   writeFooter(t(guardar), false);
   serversend200();
 }
@@ -2088,7 +2102,7 @@ void ICACHE_FLASH_ATTR espsysHTML()
   writeHeader(false,false);
   writeMenu(4, 4);
   printP(menor);  printP(table, b, tclass, ig, tnormal, mayor);
-//  printP(tr, td, Time, td_f, td); printtiempo(millis() / 1000); printP(td_f, tr_f);
+  printP(tr, td, Time, td_f, td); printtiempo(millis() / 1000); printP(td_f, tr_f);
 //  printP(tr, td, Chipid, td_f, td); printI(system_get_chip_id()); printP(td_f, tr_f);
 //  printP(tr, td, ChipFlashSize, td_f, td);  printI(ESP.getFlashChipRealSize()); printP(td_f, tr_f);
 //  printP(tr, td, Chipspeed, td_f, td);  printI(ESP.getFlashChipSpeed()); printP(td_f, tr_f);
@@ -2122,12 +2136,12 @@ void ICACHE_FLASH_ATTR espsysHTML()
 }
 
 void ICACHE_FLASH_ATTR extraevaloresTempConf(boolean withpass)
-{
+{                       // extrae datos de json.conf
   if (withpass)
-  {
+    {
     extrae(true, msg, PSTR("ss")).toCharArray(ssidSTAtemp, 20);
     extrae(true, msg, PSTR("ps")).toCharArray(passSTAtemp, 20);
-  }
+    }
   iddevicetemp = extrae(false, msg, PSTR("DV")).toInt();
   extrae(true, msg, PSTR("al")).toCharArray(aliasdevicetemp, 20);
   versinsttemp = extrae(false, msg, PSTR("v")).toInt();
@@ -2147,21 +2161,17 @@ void ICACHE_FLASH_ATTR extraevaloresTempConf(boolean withpass)
   latitudtemp = extrae(true, msg, PSTR("lat")).toFloat();
   longitudtemp = extrae(true, msg, PSTR("lon")).toFloat();
 
-  extrae(true, msg, PSTR("t0")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 0, 20);
-  extrae(true, msg, PSTR("t1")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 1, 20);
-  extrae(true, msg, PSTR("t2")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 2, 20);
+  for (byte i=0;i<2;i++) { extrae(true,msg,idpin[i]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i,20); }
+  for (byte i=0;i<1;i++) { extrae(true,msg,idpin[i+4]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i+4,20); }
+  for (byte i=0;i<1;i++) { extrae(true,msg,idpin[i+6]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i+6,20); }
 
   extrae(true, msg, PSTR("ad0")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 3, 20);
   extrae(true, msg, PSTR("au0")).toCharArray(unitpinAtemp, 4);
   factorAtemp[0] = extrae(true, msg, PSTR("af0")).toFloat();
   offsetAtemp[0] = extrae(true, msg, PSTR("ao0")).toFloat();
   bsumatAtemp[0] = extrae(true, msg, PSTR("asu0")).toInt();
-  extrae(true, msg, PSTR("e0")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 4, 20);
-  extrae(true, msg, PSTR("e1")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 5, 20);
   tipoEDtemp[0] = extrae(true, msg, PSTR("et0")).toInt();
   tipoEDtemp[1] = extrae(true, msg, PSTR("et1")).toInt();
-  extrae(true, msg, PSTR("s0")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 6, 20);
-  extrae(true, msg, PSTR("s1")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 7, 20);
   valinictemp[0] = extrae(false, msg, PSTR( "vi0")).toInt();
   valinictemp[1] = extrae(false, msg, PSTR("vi1")).toInt();
   tempdefacttemp[0] = extrae(false, msg, PSTR("on0")).toInt();
@@ -3148,7 +3158,8 @@ void ICACHE_FLASH_ATTR setupEveHTML()
   printP(pre_f, td_f, td, t(senal), td_f);
   printP(td, t(tvalor), td_f);
   printP(td, t(compa), td_f, td, t(tvalor), td_f);
-  printP(td, hist, td_f, td, t(senal), td_f);
+  printP(td, t(hist), td_f);
+  printP(td, t(senal), td_f);
   printP(td, on, barra, off, td_f, tr_f);
   //
   /////////////////////////////////////////////////////////
@@ -3157,7 +3168,7 @@ void ICACHE_FLASH_ATTR setupEveHTML()
     {
     colorea = false;
     boolean actdigital = (conf.condact[i] < 150);
-    mpi = mp*i;
+    mpi=mp*i;
     indice=(i*12)+420; // parámetros del 420/426 en adelante
     printP(tr);
     strcpy(auxchar, svhtm); strcat(auxchar, igualp); strcat(auxchar, itoa(i, buff, 10));
@@ -3193,26 +3204,26 @@ void ICACHE_FLASH_ATTR setupEveHTML()
       if (150 == conf.condact[i]) printP(b, selected, ig, comillas, selected, comillas);
       if (conf.showN) printPiP(mayorparen, 150, parenguion); else printP(mayor);
       printP(readdescr(filedesclocal, 3, 20), option_f);
-      for (byte j = 0; j < maxsalrem; j++) // añade entradas analógicas remotas
-        if (conf.idsalremote[j] > 0)
-          if (conf.senalrem[j] == 3)   {
-            printPiP(optionvalue, 160 + j, comillas);
-            if (j + 160 == conf.condact[i]) printP(b, selected, ig, comillas, selected, comillas);
+      for (byte j=0; j<maxsalrem; j++) // añade entradas analógicas remotas
+        if (conf.idsalremote[j]>0)
+          if (conf.senalrem[j]==3)   {
+            printPiP(optionvalue, 160+j, comillas);
+            if (j+160 == conf.condact[i]) printP(b, selected, ig, comillas, selected, comillas);
             if (conf.showN) printPiP(mayorparen, j + 160, parenguion); else printP(mayor);
             printP(readdescr(filesalrem, conf.prgsal[i] - 4, 20), option_f);
           }
-      for (byte j = 0; j < maxTemp; j++)   { // añade temperaturas locales
+      for (byte j=0; j<maxTemp; j++)   { // añade temperaturas locales
         printPiP(optionvalue, j + 180, comillas);
         if (j + 180 == conf.condact[i]) printP(b, selected, ig, comillas, selected, comillas);
         if (conf.showN) printPiP(mayorparen, j + 180, parenguion); else printP(mayor);
         printP(readdescr(filedesclocal, j, 20), option_f);
         }
-      for (byte j = 0; j < maxsalrem; j++) // temperaturas remotas
+      for (byte j=0; j<maxsalrem; j++) // temperaturas remotas
         {
         if (conf.idsalremote[j] > 32)  {
           if (conf.senalrem[j] < 3)     {
             printPiP(optionvalue, 200 + j, comillas);
-            if (j + 200 == conf.condact[i]) printP(b, selected, ig, comillas, selected, comillas);
+            if (j+200==conf.condact[i]) printP(b, selected, ig, comillas, selected, comillas);
             if (conf.showN) printPiP(mayorparen, j + 200, parenguion); else printP(mayor);
             printP(readdescr(filesalrem, conf.prgsal[i] - 4, 20), option_f);
             }
@@ -3237,21 +3248,21 @@ void ICACHE_FLASH_ATTR setupEveHTML()
       printP(pre_f, td_f, td);
       if (conf.bPRGeve[i][0] > 0)
         {
-        if (conf.condact[i] < 2) printP(readdescr(filedesclocal, conf.condact[i] + 4, 20));
-        else if (conf.condact[i] < 4) printP(readdescr(filedesclocal, conf.condact[i] - 2 + 6, 20));
-        else if (conf.condact[i] < 150) printP(readdescr(filesalrem, conf.condact[i] - 100, 20));
-        else if (conf.condact[i] < 160) printP(readdescr(filesalrem, conf.condact[i] - 150, 20));
-        else if (conf.condact[i] < 180) printP(readdescr(filesalrem, conf.condact[i] - 160, 20));
-        else if (conf.condact[i] < 200) printP(readdescr(filesalrem, conf.condact[i] - 180, 20));
-        else if (conf.condact[i] < 254) printP(readdescr(filesalrem, conf.condact[i] - 200, 20));
-        else if (conf.condact[i] == 254) printP(t(preciokwh));
+        if (conf.condact[i]<2) printP(readdescr(filedesclocal, conf.condact[i]+4, 20));
+        else if (conf.condact[i]<4) printP(readdescr(filedesclocal, conf.condact[i]+4, 20));
+        else if (conf.condact[i]<150) printP(readdescr(filesalrem, conf.condact[i]-100, 20));
+        else if (conf.condact[i]<160) printP(readdescr(filesalrem, conf.condact[i]-150, 20));
+        else if (conf.condact[i]<180) printP(readdescr(filesalrem, conf.condact[i]-160, 20));
+        else if (conf.condact[i]<200) printP(readdescr(filesalrem, conf.condact[i]-180, 20));
+        else if (conf.condact[i]<254) printP(readdescr(filesalrem, conf.condact[i]-200, 20));
+        else if (conf.condact[i]==254) printP(t(preciokwh));
         }
       }
     printP(td_f);
     if (actdigital)    // la señal activadora es digital
       {
       printP(td);
-      if (i == posacteve)
+      if (i==posacteve)
         printcampoSiNo(mpi + 4, conf.condvalD[i]);
       else if (conf.bPRGeve[i][0] > 0)
         printP(conf.condvalD[i] ? ON : OFF);
@@ -4092,12 +4103,11 @@ void ICACHE_FLASH_ATTR setup(void) {
   Serial.println(); Serial.println(t(files));
   SerialPrint(spiffs,b);
   if (SPIFFS.begin()) Serial.println(ok); else { Serial.println(error); ; return; }
-  Dir dir = SPIFFS.openDir(barra);
-  while (dir.next())   {
-    Serial.print(dir.fileName());  Serial.print(b);
-    File f = dir.openFile(letrar);
-    Serial.println(f.size());
-  }
+//  Dir dir=SPIFFS.openDir(barra);
+//  while (dir.next())   {
+//    Serial.print(dir.fileName());  Serial.print(b);
+//    File f=dir.openFile(letrar);
+//    Serial.println(f.size());  }
   ///////  SPIFFS FIN
   ftpSrv.begin(admin,admin);    //username, password for ftp.  set ports in ESP8266FtpServer.h  (default 21, 50009 for PASV)
 
@@ -4108,6 +4118,9 @@ void ICACHE_FLASH_ATTR setup(void) {
 
   readconf();
   if (conf.netseg==255) conf.netseg=1;      // provisional
+  strcpy(conf.mqttpath[0],conuco);
+  strcpy(conf.mqttpath[1],conf.instname);
+  strcpy(conf.mqttpath[2],itoa(conf.iddevice,buff,10));
 
   memset(mbtemp, 0, sizeof(mbtemp));         // estado relés remotos modbus (1 bit cada uno);
   memset(mbcons, 0, sizeof(mbcons));         // estado relés remotos modbus (1 bit cada uno);
@@ -4188,24 +4201,20 @@ void ICACHE_FLASH_ATTR setup(void) {
   if (conf.modo45==0) {
     SerialPrint(input,b); Serial.println(modet);
     pinMode(edPin[0], INPUT_PULLUP);
-    pinMode(edPin[1], INPUT_PULLUP);
-  }
+    pinMode(edPin[1], INPUT_PULLUP);    }
   else if (conf.modo45 == 1) {
     SerialPrint(i2c,b); Serial.println(modet);
     Wire.begin(edPin[0], edPin[1]);
     if (!bmp085.begin()) {
       Serial.print(b);
-      Serial.println(BMP085notfound);
-    }
-  }
+      Serial.println(BMP085notfound);    }  }
   else if (conf.modo45 == 2) {
     SerialPrint(modbust,b); Serial.println(modet);
     //    SoftSerial.begin(modbusbaud);
     //    SoftSerial.setTransmitEnablePin(rs485enpin);
     //    MBnode.begin(1, SoftSerial);
     pinMode (edPin[0], INPUT_PULLUP);
-    pinMode (edPin[1], OUTPUT);
-  }
+    pinMode (edPin[1], OUTPUT);  }
 
   memset(timerem, 0, sizeof(timerem));
   for (byte i=0; i<maxdevrem; i++) { actirem[i]=true; actisenal[i]=true; }
@@ -4216,8 +4225,7 @@ void ICACHE_FLASH_ATTR setup(void) {
     timeClient.setTimeOffset(7200);
     if (timeClient.update() == 1) {
       countfaulttime = 0;
-      setTime(timeClient.getEpochTime());
-    }
+      setTime(timeClient.getEpochTime());    }
     getMyIP();
 //    checkMyIP();
 //    dPrint(t(ippublica)); dPrint(dp); dPrint(conf.myippub); dPrint(crlf);
@@ -4259,6 +4267,8 @@ void ICACHE_FLASH_ATTR setup(void) {
   }
   dPrint(runningt); dPrint(crlf);
   printhora(); dPrint(crlf);
+  PSclient.setServer(conf.mqttserver, 1883);
+  PSclient.setCallback(mqttcallback);
 
   mySwitch.enableReceive(rx433);  // Receiver on interrupt 0 => that is pin #2,
 //  mySwitch.enableTransmit(tx433);  // 15
@@ -4266,10 +4276,6 @@ void ICACHE_FLASH_ATTR setup(void) {
   lcdshowstatus();
 
   ////////////////////// ZONA DE PRUEBAS ////////////
-  const char* mqtt_server = "broker.mqtt-dashboard.com";
-  PSclient.setServer(mqtt_server, 1883);
-  PSclient.setCallback(callback);
-  
   //  if (conf.tipoED[0]==1) dht0.setup(edPin[0]); // Connect DHT sensor to GPIO 4 (ED0)
   //  if (conf.tipoED[1]==1) dht1.setup(edPin[1]); // Connect DHT sensor to GPIO 5 (ED1)
 
@@ -4282,13 +4288,11 @@ void ICACHE_FLASH_ATTR setup(void) {
 
 }   // setup()
 
-void callback(char* topic, byte* payload, unsigned int length) 
+void mqttcallback(char* topic, byte* payload, unsigned int length) 
 {
   Serial.print("Message arrived ["); Serial.print(topic);  Serial.print("] ");
-  for (int i=0; i<length; i++) { Serial.print((char)payload[i]); }
-  Serial.println();
+  for (int i=0; i<length; i++) { Serial.print((char)payload[i]); }  Serial.println();
 //  MbR[0]=(int)payload;
-  MbR[0]=2345;
 // Switch on the LED if an 1 was received as first character
 //  if ((char)payload[0] == '1') {
 //    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
@@ -4299,43 +4303,28 @@ void callback(char* topic, byte* payload, unsigned int length)
 //    }
 }
 
-//void reconnect() 
-//{
-//  // Loop until we're reconnected
-//  while (!client.connected()) {
-//    Serial.print("Attempting MQTT connection...");
-//    // Attempt to connect
-//    if (client.connect("ESP8266Client")) {
-//      Serial.println("connected");
-//      // Once connected, publish an announcement...
-//      client.publish("outTopic", "hello world");
-//      // ... and resubscribe
-//      client.subscribe("inTopic");
-//    } else {
-//      Serial.print("failed, rc=");
-//      Serial.print(client.state());
-//      Serial.println(" try again in 5 seconds");
-//      // Wait 5 seconds before retrying
-//      delay(5000);
-//    }
-//  }
-//}
- 
-void reconnect() 
+boolean mqttreconnect() 
+  { 
+  if (PSclient.connect("conucoplus")) {
+    PSclient.publish("conuco/temperatura","conectado"); 
+    //    PSclient.subscribe("conuco/temperatura"); 
+    }
+  return PSclient.connected(); 
+  }
+
+void mqttpublishvalues()
 {
-  while (!PSclient.connected()) 
+  for (byte i=0;i<8;i++)
     {
-    Serial.print("Attempting MQTT connection...");
-    if (PSclient.connect("ESP8266Client")) {
-      Serial.println("connected");
-      Serial.print("Subscribe:"); Serial.println("conuco/temperatura"); 
-      PSclient.subscribe("conuco/temperatura"); 
-      } 
-    else 
-      {
-      Serial.print("failed, rc="); Serial.print(PSclient.state()); Serial.println(" try again in 5 seconds");
-      delay(5000);
-      }
+    strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
+    for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
+    strcat(auxdesc,idpin[i]);
+    if (i<=2) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
+    else if (i==3) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
+    else if (i<=5) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-2),buff,10));  }
+    else if (i<=7) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-6),buff,10));  }
+    PSclient.publish(auxdesc, auxchar);
+    strcpy(auxdesc,"");strcpy(auxchar,"");
     }
 }
 
@@ -4625,13 +4614,27 @@ void ICACHE_FLASH_ATTR loop(void)
   }
 
   unsigned long tini = millis();
-  ////////////////////////////////////////////////////  
-  ftpSrv.handleFTP();        //make sure in loop you call handleFTP()!!  
+  //////////////////////////////////////////////////  
+  if (conf.ftpenable) ftpSrv.handleFTP();        //make sure in loop you call handleFTP()!!  
   server.handleClient();    // atiende peticiones http
-  if (!PSclient.connected()) { reconnect(); }
-  PSclient.loop();
+
+  if (conf.mqttenable) 
+    {
+    if (!PSclient.connected())
+      {
+      long tnow = millis();
+      if (tnow-lastReconnectAttempt>5000) {
+        lastReconnectAttempt=tnow;
+//        if (mqttreconnect()) lastReconnectAttempt=0;    // Attempt to reconnect
+        if (mqttreconnect()) lastReconnectAttempt=0;    // Attempt to reconnect
+        }
+      } 
+    else 
+      PSclient.loop();
+    }
   //  fauxmo.handle();
   ////////////////////////////////////////////////////  
+
   if ((millis() - tini) > 5000) { SerialPrint(handleclientt,dp); Serial.println(millis()-tini); }
   leevaloresDIG();
   if ((millis() > (mact1 + 1000)))    // tareas que se hacen cada segundo
@@ -4720,13 +4723,10 @@ void ICACHE_FLASH_ATTR loop(void)
     }
 
   if ((millis() > (mact10 + (conf.peractrem * 1000))))  // tareas que se hacen cada "peractrem" segundos
-  {
+    {
     tini = millis();
 //////////////////////////////////////////////
-//      snprintf (msgmqtt, 75, "Temp. #%ld", MbR[0]+2345);
-      snprintf (msgmqtt, 75, "Temp. #%ld", testvalue++);
-      Serial.print("Publish message: ");  Serial.println(msgmqtt);
-      PSclient.publish("conuco/temperatura", msgmqtt);
+    if (conf.mqttenable) {  mqttpublishvalues();    }
 /////////////////////////////////////////////   
 //    if (!pendsave) lcdshowstatus();
     lastpro = 0; lastcode = 0; lastlen = 0; // pone a cero el último código 433

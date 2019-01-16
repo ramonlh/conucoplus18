@@ -1,109 +1,109 @@
 Act.                                    
-activadora                              
-Activo                                  
+trigger                                 
+Active                                  
 auto.                                   
-Act. Panel                              
-Actualizar                              
+Update Panel                            
+Update                                  
 Ana.                                    
-analógica                               
-Año                                     
-Asociar a                               
-Autenticación                           
-Canal                                   
+analogic                                
+Year                                    
+Asociate to                             
+Authentication                          
+Channel                                 
 Comp.                                   
-Condiciones                             
-Conectado                               
-Conectando                              
-Conectar                                
-Configuración                           
-Confirme Contraseña                     
-Consigna                                
-Contraseña                              
+Events                                  
+Connected                               
+Connecting                              
+Connect                                 
+Setup                                   
+Confirm Password                        
+Setpoint                                
+Password                                
 de                                      
 Des                                     
-Descripción                             
-Día                                     
-Dir. IP                                 
-Disp.                                   
-Dispositivo                             
-Ejecutar                                
-Ent.                                    
-Ent. Analog.                            
-Ent. Dig.                               
-Entrada                                 
+Description                             
+Day                                     
+IP address                              
+Dev.                                    
+Device                                  
+Run                                     
+Inp.                                    
+Analog. Input                           
+Dig. Input                              
+Input                                   
 Error comm.                             
-Escena                                  
-Escenas                                 
-Estado                                  
-fábrica                                 
-Fecha                                   
-Ficheros                                
-Guardar                                 
-Hora                                    
-Inicial                                 
-IP estática                             
-IP pública                              
+Macro                                   
+Macros                                  
+Status                                  
+factory                                 
+Date                                    
+Files                                   
+Save                                    
+Hour                                    
+Initial                                 
+Static IP                               
+Public IP                               
 Lat                                     
 Lon                                     
-Latitud                                 
-Longitud                                
-Mando RF                                
-Mes                                     
-Modo                                    
-Mostrar códigos                         
+Latitude                                
+Longitude                               
+Remote RF                               
+Month                                   
+Mode                                    
+Show codes                              
 NO                                      
-No hacer nada                           
-Nombre                                  
+Nothing                                 
+Name                                    
 Notif.                                  
-Notificación IFTTT                      
-NUEVO                                   
-Nuevo remoto                            
-pines                                   
-Precio kwh                              
-Programa                                
-Programas                               
-Red                                     
-Serv. Red                               
-Reiniciando                             
-Relé                                    
-Remoto                                  
+IFTTT Notification                      
+NEW                                     
+New remote                              
+pins                                    
+Price kwh                               
+Program                                 
+Programs                                
+Net                                     
+Net serv.                               
+Restarting                              
+Relay                                   
+Remote                                  
 Remote Dev.                             
-Act. Rem.                               
-Reset Fábrica                           
-Reset Ficheros                          
-Sal. Dig.                               
-Salida                                  
+Rem. upd.                               
+Reset Factory                           
+Reset Files                             
+Dig. Out.                               
+Output                                  
 Scan                                    
-Seguridad                               
-Semanal                                 
-Señal                                   
-Servidor IP pública                     
+Security                                
+Weekly                                  
+Signal                                  
+Public IP server                        
 SÍ                                      
-Sistema                                 
-Sonda                                   
-Sondas Temp.                            
+System                                  
+Probe                                   
+Temp. probes                            
 SR                                      
-Temperatura                             
-Termostato                              
+Temperature                             
+Thermostat                              
 TDP                                     
-Timeout Remotos                         
-Tipo                                    
-Último Valor                            
-Unid.                                   
-Usuario                                 
-Valor                                   
-Versión                                 
-Versión actualizada                     
+Timeout Remotes                         
+Tipe                                    
+Last value                              
+Unit                                    
+User                                    
+Value                                   
+Version                                 
+Updated version                         
 Version check failed, HTTP code:        
 Web Calls                               
-Instalada                               
-Actual                                  
+Installed                               
+Current                                 
 WiFi mode                               
-Zona                                    
-Zonas                                   
-                                        
-                                        
-                                        
+Zone                                    
+Zones                                   
+FTP server                              
+Instalation                             
+Hyst.                                   
                                         
                                         
                                         

@@ -8,7 +8,8 @@ typedef struct {    // datos configuración
                 code433type code433;
                 char watermark[7]="conuco";        // código de verificación conuco
                 byte iddevice=150;                // número dispositivo por defecto
-                char aliasdevice[20]="NUEVO";    // 20 bytes, descripción del dispositivo
+                char aliasdevice[10]="NUEVO";     // 10 bytes, descripción del dispositivo
+                char DISPONIBLE[10]="";           // 10 bytes, dISPONIBLES
                 byte bestado=0;                   // 1 bytes, estado de salidas digitales en el arranque
                 byte valinic[maxSD]={2,2};        // 2x1, 2 bytes, valor inicial de las salidas digitales
                 byte showN=0;                     // 1 byte, indica si se muestra el número de pin en la lista de señales
@@ -109,6 +110,10 @@ typedef struct {    // datos configuración
                 byte MbC8[1]={0};                 // estado de ED y SD: 0:SD0, 1:SD1, 2:ED0, 3:ED1
                 byte ftpenable=1;                 // 0=disnable, 1=enable
                 byte lang=0;                      // 0=español, 1=inglés
+                byte mqttenable=0;                // desactiva MQTT
+                char mqttserver[40]="";           // MQTT broker
+                char mqttpath[6][10]={"","","","","",""};             // MQTT path
+                char instname[10]="";             // nombre de la instalación
                } conftype;
 
 conftype conf;     
@@ -122,6 +127,7 @@ byte rx433=2;              // en el Wemos D1 Mini se usa el 2 para el LED
 byte ledSt=15;             // Led estado Wemos=2, Electrodragon=16
 byte tx433=15;             // NO USADO 
 byte bt2Pin=0;             // botón 2
+const char idpin[8][4]={"t0","t1","t2","a0","e0","e1","s0","s1"};
 //////  tratamiento de bits /////////////////////
 const byte tab[8] = {1,2,4,8,16,32,64,128}; // 8
 
@@ -187,7 +193,6 @@ byte ListOri[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 float factorAtemp[maxEA]={1.0}; // 1x4 factor conversión analógicas locales temp
 float offsetAtemp[maxEA]={0.0}; // 1x4 offset conversión analógicas locales temp
 
-//byte MbC8[1]={0};               // estado de ED y SD: 0:SD0, 1:SD1, 2:ED0, 3:ED1
 byte MbC8ant[1]={0};            // estado anterior de ED y SD: 0:SD0, 1:SD1, 2:ED0, 3:ED1
 int MbR[4];                     // 0-2 Temperaturas locales, 3 analógica local
 int MbRant[4];                  // 0-2 Temperaturas locales, 3 analógica local, valores anteriore
@@ -239,6 +244,7 @@ byte panelact=0;
 byte nivmenu=0;
 byte prisalrem=0;
 byte hacerresetrem=0;
+long lastReconnectAttempt=0;
 boolean pendsave = false;
 IoTtweet myiot;       //naming your devices
 conucodata datosremoto;
@@ -266,6 +272,7 @@ char filespanish[]="/spanish.txt";
 char fileenglish[]="/english.txt";
 char filelog[]="/log.txt";
 
+int testvalue=0;
 //////////////  BMP085
 //const unsigned char OSS=0;  // Oversampling Setting
 //// Calibration values
