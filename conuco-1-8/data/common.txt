@@ -1,44 +1,247 @@
 1234567890123456789012345678901234567890
-/conf.txt                               
-/log.txt                                
-/zonas.txt                              
-/devrem.txt                             
-/salrem.txt                             
-/webcall.txt                            
-/urlwebcall.txt                         
-/descprg.txt                            
-/descesc.txt                            
-/macdevrem.txt                          
-/idmyjsonrem.txt                        
-/unitsalrem.txt                         
-/url.txt                                
-/localdesc.txt                          
-/desctemp.txt                           
-/i2ctypes.txt                           
-/spanish.txt                            
-/english.txt                            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+dBm                                     
+Time                                    
+Chip_id                                 
+Chip_Flash_Size                         
+Chip_speed                              
+sdk_version                             
+vdd33                                   
+adc_read                                
+boot_version                            
+boot_mode                               
+userbin_addr                            
+cpu_freq                                
+flash_get_id                            
+opmode                                  
+opmode_default                          
+connect_status                          
+get_current_ap_id                       
+auto_connect                            
+dhcpc_status                            
+_hostname                               
+station_num                             
+dhcps_status                            
+phy_mode                                
+sleep_type                              
+broadcast_if                            
+user_limit_rate_mask                    
+channel                                 
+free_heap_size                          
+rtc_time                                
+BMP085_not_found                        
+sensor_I2C                              
+MQTT                                    
+path                                    
+STAR                                    
+BAUD *                                  
+CONTROL                                 
+SAFE                                    
+FULL                                    
+POWER                                   
+SPOT                                    
+CLEAN                                   
+MAX                                     
+DRIVE *                                 
+MOTORS *                                
+LEDS *                                  
+SONG *                                  
+PLAY *                                  
+SENSORS *                               
+DOCK                                    
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
