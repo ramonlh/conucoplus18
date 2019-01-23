@@ -104,99 +104,20 @@ Zonas
 FTP server                              
 Instalación                             
 Hist.                                   
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-										   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+1-31:MB, 150-166:Conuco, Resto:I2C      
+No hacer nada                           
+Falta algún fichero necesarios<br>      
+Use FTP o \"Sketch Data Upload\"<br>    
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .
+                                       .

@@ -48,14 +48,145 @@ SONG *
 PLAY *                                  
 SENSORS *                               
 DOCK                                    
-                                       .
-                                       .
-                                       .
-                                       .
-                                       .
-                                       .
-                                       .
-                                       .
+xmlns=\"http://www.w3.org/1999/xhtml\"  
+myjson.com                              
+www.iottweet.com                        
+www.google.es/maps                      
+http://www.iottweet.com                 
+icanhazip.com                           
+api.myjson.com                          
+europe.pool.ntp.org                     
+ifttt.com                               
+maker.ifttt.com                         
+https://dweet.io/get/dweets/for/        
+getdweet                                
+/get/latest/dweet/for/                  
+/dweet/for/                             
+dweet.io                                
+.ino.bin                                
+Parasite                                
+Power                                   
+Min.                                    
+Port                                    
+'file'                                  
+update                                  
+dev                                     
+Chip Flash.                             
+Freq.                                   
+DNS                                     
+Mask                                    
+mode                                    
+Gateway                                 
+http://                                 
+https://                                
+Alias                                   
+12341234                                
+I2C                                     
+INTRO                                   
+ESC                                     
+UP                                      
+DOWN                                    
+LEFT                                    
+RIGTH                                   
+UP                                      
+DW                                      
+LF                                      
+RT                                      
+RF                                      
+ModBus                                  
+T-32-P                                  
+Local I/O                               
+IoTtweet                                
+MyJson                                  
+api                                     
+Dig. Input                              
+admin                                   
+SPIFFS                                  
+pretty                                  
+watermark                               
+WebCall                                 
+ND                                      
+hidden                                  
+Host:                                   
+IP                                      
+Running                                 
+WiFi                                    
+Timeout Http                            
+SMTP Per.                               
+SMTP Server                             
+SMTP Port                               
+SMTP User                               
+SMTP Pass                               
+SMTP Sender                             
+SMTP Dest.                              
+pinvalR:                                
+Un.                                     
+Si                                      
+No                                      
+Seg. ON                                 
+Seg. OFF                                
+pon                                     
+pof                                     
+Panel                                   
+Dig.                                    
+digital                                 
+Addr                                    
+AP mode SSID                            
+AP mode Password                        
+Default                                 
+DISPOSITIVO REMOTO                      
+disabled                                
+Dweet.io                                
+ERROR                                   
+ESP8266                                 
+STA mode SSID                           
+STA mode Password                       
+system                                  
+submit                                  
+ThingName                               
+rem=                                    
+Remote I/O                              
+Reset                                   
+Reset WiFi                              
+Restart                                 
+rfkey                                   
+rfon                                    
+foff                                    
+Reqjson                                 
+I2C device found at address 0x          
+Unknow error at address 0x              
+No I2C devices found                    
+<font size=6 color=\"yellow\">          
+/trigger/                               
+/with/key/                              
+301                                     
+303                                     
+404                                     
+application/json; charset=utf-8         
+application/octet-stream                
+/bins/                                  
+<body>                                  
+</body>                                 
+Cache-Control                           
+checkbox                                
+<center>                                
+</center>                               
+class                                   
+Connection                              
+close                                   
+Content-Type                            
+Content-Disposition                     
+conuco                                  
+CONUCO                                  
+data                                    
+dataType                                
+ESPSESSIONID                            
+<formaction\"save\" method=\"get\">     
+</form>                                 
+handleClient                            
+head                                    
+html                                    
+HTTP/1.1                                
                                        .
                                        .
                                        .
