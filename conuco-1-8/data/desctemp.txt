@@ -1,8 +1,4 @@
-                   
-                   
-                   
-                   
-                   
-                   
-                   
+Sonda 1            Sonda 2             
+                  Ent. Analog.        Ent. Dig. 1            
+               Sal. Dig. 1              
                    
