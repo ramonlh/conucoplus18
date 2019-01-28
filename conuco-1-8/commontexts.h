@@ -185,6 +185,7 @@ PGM_P(trestart)="Restart";
 PGM_P(nohacernada)="No hacer nada";
 PGM_P(treset)="Reset";
 PGM_P(tresetwifi)="Reset WiFi";
+PGM_P(tresetfab)="Reset Fábrica";
 PGM_P(modbust)="ModBus";
 PGM_P(textplain)="text/plain";
 PGM_P(tPOST)="POST";

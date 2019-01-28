@@ -97,7 +97,7 @@
 #define tremoto 69
 #define remotos 70
 #define periodoactrem 71
-#define tresetfab 72
+//#define tresetfab 72
 #define tresetfiles 73
 #define saldig 74
 #define salida 75

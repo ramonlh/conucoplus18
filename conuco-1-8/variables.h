@@ -1,3 +1,4 @@
+
 ///////////////////////////////////////////////////////////////////////////////
 typedef struct {byte pro[6]; unsigned long code[6]; int len[6];} rftype;   // 42 bytes
 typedef struct {byte proon[18]; unsigned long codeon[18]; int lenon[18]; byte prooff[18]; unsigned long codeoff[18]; int lenoff[18];} code433type;   // 252 bytes
@@ -8,8 +9,7 @@ typedef struct {    // datos configuración
                 code433type code433;
                 char watermark[7]="conuco";        // código de verificación conuco
                 byte iddevice=150;                // número dispositivo por defecto
-                char aliasdevice[10]="NUEVO";     // 10 bytes, descripción del dispositivo
-                char DISPONIBLE[10]="";           // 10 bytes, dISPONIBLES
+                char aliasdevice[20]="NUEVO";     // 20 bytes, descripción del dispositivo
                 byte bestado=0;                   // 1 bytes, estado de salidas digitales en el arranque
                 byte valinic[maxSD]={2,2};        // 2x1, 2 bytes, valor inicial de las salidas digitales
                 byte showN=0;                     // 1 byte, indica si se muestra el número de pin en la lista de señales

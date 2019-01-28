@@ -1,7 +1,7 @@
 
 
 #define INITFAB false    // si true, se resetea a fábrica, si false no se hace nada
-#define versinst 1811    // se añade: Sistema de ficheros, gestión de zonas, control por 433, 32 señales remotas
+#define versinst 1812    // se añade: Sistema de ficheros, gestión de zonas, control por 433, 32 señales remotas
 #define debug true
 #define debugwifi false
 
@@ -1609,7 +1609,7 @@ void ICACHE_FLASH_ATTR setupDevHTML()
   printP(t(dispositivo), td_f,td);
   printcampoC(10, conf.instname, 10, true, true, false);
   printP(td_f,td);
-  printcampoC(8, conf.aliasdevice, 10, true, true, false);
+  printcampoC(8, conf.aliasdevice, 20, true, true, false);
   printP(td_f);
   printColspan(2);
   printcampoCB(0, conf.iddevice, 150, 166);
@@ -3793,7 +3793,7 @@ void ICACHE_FLASH_ATTR resetHTML()
   printP(tr);
   printP(td, treset, barra);
   printP(trestart, td_f, td);
-  printcampoCB(0, 0, nohacernada, treset, trestart, tresetwifi, t(tresetfab));
+  printcampoCB(0, 0, nohacernada, treset, trestart, tresetwifi,tresetfab);
   printP(td_f,tr_f);
   writeFooter(tejecutar, false);
   serversend200();
