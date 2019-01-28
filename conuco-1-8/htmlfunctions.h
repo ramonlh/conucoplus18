@@ -17,7 +17,7 @@ void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3, PGM_P te
 
 void ICACHE_FLASH_ATTR printI(int value)  { printP(itoa(value, buff, 10));  }
 void ICACHE_FLASH_ATTR printH(int value)  { printP(itoa(value, buff, 16));  }
-void ICACHE_FLASH_ATTR printL(unsigned long value)  { printP(itoa(value, buff, 10));  }
+void ICACHE_FLASH_ATTR printL(long value)  { printP(ltoa(value, buff, 10));  }
 
 void ICACHE_FLASH_ATTR printF(float value, byte deci) {
   float pdec=value-int(value);
@@ -31,30 +31,26 @@ void ICACHE_FLASH_ATTR printPiP(const char *texto1, int num, const char *texto2)
   { printP(texto1); printI(num); printP(texto2);}
 
 void ICACHE_FLASH_ATTR printColspan(int ancho)
-  { printP(tdcolspan_i); printI(ancho); printP(comillas, mayor);}
+  { printP(c(tdcolspan_i)); printI(ancho); printP(comillas, mayor);}
   
 void ICACHE_FLASH_ATTR espacioSep(int col)  //  espacio separación
   { printP(tr); printColspan(col);printP(td_f,tr_f);  }
 
-void printinicampo() { printP(menor, input, b, type, ig, comillas); }
-void printfincampo() { printP(mayor, menor, barra, input, mayor); }
-void printdisabled() { printP(text); printP(comillas,b,disabled,ig,comillas, disabled); }
+//void printinicampo() { printP(menor, c(tinput), b, type, ig, comillas); }
+void printfincampo() { printP(mayor, menor, barra, c(tinput), mayor); }
+void printdisabled() { printP(c(ttext)); printP(comillas,b,c(disabled)); printP(ig,comillas, c(disabled)); }
 void printselected(boolean check) { printP(b, check?checked:selected); }
-
-void printIniCampo2(PGM_P tipo, int numpar)
-{
-  printP(tipo, comillas, b, namet, ig,comillas);
-  printI(numpar);
-  printP(comillas,b, value, ig,comillas);
-}
 
 void ICACHE_FLASH_ATTR printcampoI(int numpar, int valactual, byte tam, boolean enabled)
 {
-  printinicampo();
+  printP(menor, c(tinput), b, type, ig, comillas);  
   if (!enabled) printdisabled();
-  printIniCampo2(text,numpar);
+  printP(c(ttext), comillas, b);
+  printP(c(namet), ig,comillas);
+  printI(numpar);
+  printP(comillas,b, tvalue, ig,comillas);
   printI(valactual);
-  printP(max_length);
+  printP(comillas,b,c(max_length));
   printIP(tam, size_i);
   printIP(tam,comillas);
   printfincampo();
@@ -62,10 +58,14 @@ void ICACHE_FLASH_ATTR printcampoI(int numpar, int valactual, byte tam, boolean 
 
 void ICACHE_FLASH_ATTR printcampoL(int numpar, long valactual, byte tam, boolean enabled)
 {
-  printinicampo();
+  printP(menor, c(tinput), b, type, ig, comillas);
   if (!enabled) printdisabled();
-  printIniCampo2(text,numpar);  
-  printIP(valactual,max_length);
+  printP(c(ttext), comillas, b);
+  printP(c(namet), ig,comillas);
+  printI(numpar);
+  printP(comillas,b, tvalue, ig,comillas);
+  printI(valactual);
+  printP(comillas,b,c(max_length));
   printIP(tam, size_i);
   printIP(tam, comillas);
   printfincampo();
@@ -73,26 +73,33 @@ void ICACHE_FLASH_ATTR printcampoL(int numpar, long valactual, byte tam, boolean
 
 void ICACHE_FLASH_ATTR printcampoF(int numpar, float valactual, int deci)
 {
-  printinicampo();
-  printIniCampo2(text,numpar);
+  printP(menor, c(tinput), b, type, ig, comillas);
+  printP(c(ttext), comillas, b);
+  printP(c(namet), ig,comillas);
+  printI(numpar);
+  printP(comillas,b, tvalue, ig,comillas);
   printF(valactual, deci);
-  printPiP(max_length,10,size_i);
+  printP(comillas,b,c(max_length));
+  printIP(10,size_i);
   printIP(10,comillas);
   printfincampo();
 }
 
 void ICACHE_FLASH_ATTR printcampoC(int numpar, char *valactual, byte tam, boolean visible, boolean enabled, boolean pass)
 {
-  printinicampo();
+  printP(menor, c(tinput), b, type, ig, comillas);
   if (visible)  {
-    printP(pass?password:text);
-    if ((!enabled) && (!pass)) printP(comillas, b, disabled, ig, comillas, disabled);
+    printP(pass?c(password):c(ttext));
+    if ((!enabled) && (!pass)) { printP(comillas, b, c(disabled)); printP(ig, comillas, c(disabled)); }
     printP(comillas);   }
   else
-    printP(text, comillas, b, invis, b);
-  printP(b, namet, ig );
+    {
+    printP(c(ttext), comillas, b);
+    printP(c(invis), b);  }
+  printP(b, c(namet), ig );
   printPiP(comillas,numpar, comillas);
-  printP(b, value, ig, comillas, valactual, max_length);
+  printP(b, tvalue, ig, comillas, valactual);
+  printP(comillas,b, c(max_length));
   printIP(tam, size_i);
   printIP(tam, comillas);
   printfincampo();
@@ -107,13 +114,16 @@ void ICACHE_FLASH_ATTR printparCP(const char *titulo, int numpar, char valactual
 
 void ICACHE_FLASH_ATTR printcampoSiNo(int numpar, int valactual)
   {
-  printPiP(Select_name, numpar, comillas);
-  printP(mayor, optionvalue, cero, comillas);
+  printP(c(Select_name), comillas);
+  printIP(numpar, comillas);
+  printP(mayor, c(optionvalue),comillas, cero, comillas);
   if (valactual==0) printselected(false);
-  printP(mayor, OFF, option_f);
-  printPiP(optionvalue, 1, comillas);
+  printP(mayor, OFF, c(option_f));
+  printP(c(optionvalue));
+  printPiP(comillas, 1, comillas);
   if (valactual) printselected(false);
-  printP(mayor, ON, option_f, select_f);
+  printP(mayor, ON, c(option_f));
+  printP(c(select_f));
   }
 
 void ICACHE_FLASH_ATTR printparentesis(PGM_P letra, int numero)
@@ -125,30 +135,38 @@ void ICACHE_FLASH_ATTR printparentesis(PGM_P letra, int numero)
 
 void ICACHE_FLASH_ATTR checkBox(int numpar, bool selected)
 {
-  printinicampo();
-  printIniCampo2(checkbox,numpar);
-  printP(uno, comillas);
+  printP(menor, c(tinput), b, type, ig, comillas);
+  printP(c(checkbox), comillas, b);
+  printP(c(namet), ig,comillas);
+  printI(numpar);
+  printP(comillas,b, tvalue, ig,comillas);
+  printP(uno,comillas);
   if (selected) printselected(true);
   printfincampo();
 }
 
 void ICACHE_FLASH_ATTR writeHeader(boolean refreshmode, boolean ajaxmode)
 {
-  printP(menor, html, b, xmlns, mayor);
-  printP(menor, head, mayor, menor, title, mayor);
-  printP(conuco,web,tserver, menor, barra, title);
+  printP(menor, thtml);
+  printP(b, c(xmlns), mayor);
+  printP(menor, thead, mayor, menor, c(title), mayor);
+  printP(c(conuco));
+  printP(c(web));
+  printP(c(tserver), menor, barra);
+  printP(c(title));
   printP(mayor,htmlHead_3);
   if (ajaxmode)
     printP(ajaxscript);
   else
     if (refreshmode)
-      if (conf.peractpan>0) printPiP(htmlRefresh_i, conf.peractpan, comillascierre);
-  printP(head_f);
+      if (conf.peractpan>0) printPiP(c(htmlRefresh_i), conf.peractpan, comillascierre);
+  printP(c(head_f));
 }
 
 void printinicampoCB(int numpar)
 {
-  printPiP(Select_name, numpar, comillas);
+  printP(c(Select_name), comillas);
+  printIP(numpar, comillas);
   printP(mayor);
 }
 
@@ -156,22 +174,23 @@ void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, int pri, int ult)
 {
   printinicampoCB(numpar);
   for (byte j=pri; j<=ult; j++)   {
-    printPiP(optionvalue, j, comillas);
+    printP(c(optionvalue));
+    printPiP(comillas, j, comillas);
     if (valact==j) printselected(false);
-    printPiP(mayor, j, option_f);   }
-  printP(select_f);
+    printPiP(mayor, j, c(option_f));   }
+  printP(c(select_f));
 }
 
 void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, byte lon, PGM_P t[])
 {
   printinicampoCB(numpar);
-  for (byte j=0;j<lon;j++)
-    {
-    printPiP(optionvalue, j, comillas);
+  for (byte j=0;j<lon;j++)   {
+    printP(c(optionvalue));
+    printPiP(comillas, j, comillas);
     if (valact==j) printselected(false);
-    printP(mayor,t[j],option_f);
-    }
-  printP(select_f);
+    printP(mayor,t[j]);
+    printP(c(option_f));   }
+  printP(c(select_f));
 }
 
 void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1)
@@ -225,42 +244,53 @@ char* ICACHE_FLASH_ATTR textonoff(float valor)
 
 void ICACHE_FLASH_ATTR writeForm(PGM_P phtm)
 {
-  printP(form_action, phtm, Form_post, menor);
-  printP(table, b, tclass, ig, tnormal, mayor);
+  printP(c(form_action), phtm);
+  printP(comillas,b);
+  printP(c(Form_post), menor);
+  printP(table, b);
+  printP(c(tclass), ig, tnormal, mayor);
 }
 
 void ICACHE_FLASH_ATTR writeFooter(PGM_P texto, boolean cerrar)
 {
-  printP(menor, barra, table, mayor);
-  printinicampo();
-  printP(submit);
-  printP(comillas, b, value, ig, comillas, texto);
-  if (cerrar) printP(comillas, b, onclickclose);
+  printP(menor, barra, table, mayor);               // final <table>
+  printP(menor, c(tinput), b, type, ig, comillas);
+  printP(submit);                                   // submit
+  printP(comillas, b, tvalue, ig, comillas);      // " value="texto
+  printP(texto);                                    
+  if (cerrar) printP(comillas, b, c(onclickclose));
   printP(comillas);
   printfincampo();
-  printP(form_f, body_f, menor, barra, html, mayor);
+  printP(c(form_f));
+  printP(c(body_f), menor, barra);
+  printP(thtml, mayor);
 }
 
 void ICACHE_FLASH_ATTR setCookie(byte valor)
 {
-  msg="";
-  printP(HTTP11, b, t301, b, ok, crlf);
-  printP(setcookie,dp, b, espsessionid, ig, valor==0?cero:uno);
-  printP(crlf,location, dp, b, barra, crlf);
-  printP(cachecontrol,dp, b, nocache, crlf, crlf);
+  msg=vacio;
+  printP(c(HTTP11), b);
+  printP(c(t301), b, ok, crlf);
+  printP(c(setcookie),dp, b);
+  printP(c(espsessionid), ig, valor==0?cero:uno);
+  printP(crlf,c(location), dp, b, barra, crlf);
+  printP(c(cachecontrol),dp, b);
+  printP(c(nocache), crlf, crlf);
   server.sendContent(msg);
-  msg="";
+  msg=vacio;
 }
 
 void ICACHE_FLASH_ATTR sendOther(const char *otherURL, int param)
 {
-  msg="";
-  printP(HTTP11,b,t303,b,seeother,crlf);
-  printP(location,dp,b,otherURL);
+  msg=vacio;
+  printP(c(HTTP11),b);
+  printP(c(t303),b);
+  printP(c(seeother),crlf);
+  printP(c(location),dp,b,otherURL);
   if (param>=0) { printP(paramn);printI(param);}
   printP(crlf,crlf);
   server.sendContent(msg);
-  msg="";
+  msg=vacio;
 }
 
 void ICACHE_FLASH_ATTR printDiaSem(byte i)

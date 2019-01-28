@@ -54,7 +54,7 @@ typedef struct {    // datos configuración
                 byte bescenaact[maxEsc][5];       // 2 x 5 = 10 bytes, activación de escenas  (valor >0, ni ON ni OFF), conjuntamente con bescena
                 byte bactfec[1]={0};              // 1 byte, por bits, uno por programa
                 byte fecsal[maxPrgFec]={0,0,0,0}; // 4 bytes, salida a actuar en cada programación por fechas
-                byte fecano[maxPrgFec]={0,0,0,0}; // 4 bytes, año menos 2000 para poder usar un byte
+                byte fecano[maxPrgFec]={0,0,0,0}; // 4 bytes, año menos 2000 para poder usar un byte NO USADO-DISPONIBLE
                 byte fecmes[maxPrgFec]={0,0,0,0}; // 4 bytes, mes
                 byte fecdia[maxPrgFec]={0,0,0,0}; // 4 bytes, día del mes
                 byte fechor[maxPrgFec]={0,0,0,0}; // 4 bytes, hora
@@ -144,7 +144,7 @@ char fwUrlBasetemp[80]="";
 ////UPDATER END
 
 String msg;                     // String donde se construye la respuesta HTML qu e se envía al cliente
-char buff[6];                   // 6 bytes, auxiliar
+char buff[20];                  // 20 bytes, auxiliar
 char auxchar[130];              // 130 bytes, auxiliar 
 char auxdesc[60];               // 20 bytes, auxiliar para lectura de descriptores de archivos
 byte addr[maxTemp][8];          // 3x8, 24 bytes identificador de cada sonda DS18B20 (64)
@@ -241,7 +241,6 @@ int lastlen=0;
 byte paract=0;
 float dhtdata[2][2];
 byte panelact=0;
-byte nivmenu=0;
 byte prisalrem=0;
 byte hacerresetrem=0;
 long lastReconnectAttempt=0;

@@ -12,7 +12,7 @@ void buildvalorI(PGM_P cad1, PGM_P cad2, PGM_P cad3, int pos, int value, PGM_P c
   if (pos>=0) printI(pos);
   printP(comillas,dp);
   printI(value);
-  printP(coma);
+  printP(cadf,coma);
 }
 
 void buildvalorL(PGM_P cad1, PGM_P cad2, PGM_P cad3, int pos, long value, PGM_P cadf)
@@ -21,7 +21,7 @@ void buildvalorL(PGM_P cad1, PGM_P cad2, PGM_P cad3, int pos, long value, PGM_P 
   if (pos>=0) printI(pos);
   printP(comillas,dp);
   printL(value);
-  printP(coma);
+  printP(cadf,coma);
 }
 
 void buildvalorF(PGM_P cad1, PGM_P cad2, PGM_P cad3, int pos, float value, byte deci, PGM_P cadf)
@@ -30,7 +30,7 @@ void buildvalorF(PGM_P cad1, PGM_P cad2, PGM_P cad3, int pos, float value, byte 
   if (pos>=0) printI(pos);
   printP(comillas,dp);
   printF(value,deci);
-  printP(coma);
+  printP(cadf,coma);
 }
 
 void buildvalorC(PGM_P cad1, PGM_P cad2, PGM_P cad3, int pos, char *value, PGM_P cadf)
@@ -80,19 +80,19 @@ void ICACHE_FLASH_ATTR buildjsonext()
 
   buildvalorI(letraD,letraV,vacio,-1,conf.iddevice,vacio);
   buildvalorC(letraM,letraJ,vacio,-1,conf.idmyjson,vacio);
-  buildvalorC(alias,vacio,vacio,-1,conf.aliasdevice,vacio);
-  buildvalorI(vers,vacio,vacio,-1,versinst,vacio);
+  buildvalorC(c(alias),vacio,vacio,-1,conf.aliasdevice,vacio);
+  buildvalorI(c(vers),vacio,vacio,-1,versinst,vacio);
   buildvalorF(t(45),vacio,vacio,-1,conf.latitud,6,vacio);   // latitud
   buildvalorF(t(46),vacio,vacio,-1,conf.longitud,6,vacio);  // longitud
 
-  for (byte i = 0; i < maxEsc; ++i) // ESCENAS
+  for (byte i=0; i<maxEsc; ++i) // ESCENAS
    {
     buildtipo(letrae,letras,i);
     buildvalorI(letras,vacio,vacio,-1,getbit8(conf.bshowEsc, i),vacio);
     buildvalorC(letrau,letraa,vacio,i,readdescr(filedescesc,i,20),llave_f);
    }
   
-  for (byte i = 0; i < maxTemp; ++i) // TEMPERATURAS
+  for (byte i=0; i<maxTemp; ++i) // TEMPERATURAS
    {
     buildtipo(letrat,letral,i);
     buildvalorI(letras,vacio,vacio,-1,getbit8(conf.bshowbypanel[0], i),vacio);
@@ -113,14 +113,14 @@ void ICACHE_FLASH_ATTR buildjsonext()
     buildvalorC(letran,vacio,vacio,-1,readdescr(filedesclocal,i+4,20),vacio);
     buildvalorI(letrav,vacio,vacio,-1,getbit8(conf.MbC8,i+2),llave_f);
   }
-  for (byte i = 0; i < maxSD; ++i)    // SALIDAS DIGITALES
+  for (byte i=0; i<maxSD; ++i)    // SALIDAS DIGITALES
   {
     buildtipo(letras,letral,i);
     buildvalorI(letras,vacio,vacio,-1,getbit8(conf.bshowbypanel[0], i+6),vacio);
     buildvalorC(letran,vacio,vacio,-1,readdescr(filedesclocal,i+6,20),vacio);
     buildvalorI(letrav,vacio,vacio,-1,getbit8(conf.MbC8,i),llave_f);
   }
-  for (byte i = 0; i < maxsalrem; ++i)    // Señales remotas
+  for (byte i=0; i<maxsalrem; ++i)    // Señales remotas
   {
     buildtipo(letrar,vacio,i);
     buildvalorI(letras,vacio,vacio,-1,getbit8(conf.bshowbypanel[0], i+8),vacio);
@@ -145,7 +145,7 @@ void ICACHE_FLASH_ATTR buildJsonConf(boolean remoto, boolean sendpass, boolean r
     printP(comillas,letrap,letras,comillas,dp,comillas); printP(remoto?passSTAtemp:conf.passSTA); printP(comillas,coma);
     }
   
-  buildvalorI(letrav,letras,letrat,-1,resetear?1:0,vacio);
+  buildvalorI(letrar,letras,letrat,-1,resetear?1:0,vacio);
   buildvalorI(letraD,letraV,vacio,-1,remoto?iddevicetemp:conf.iddevice,vacio);
   buildvalorI(letrav,vacio,vacio,-1,versinst,vacio);
   buildvalorI(letraa,letraa,vacio,-1,remoto?actualizauttemp:conf.actualizaut,vacio);
@@ -160,7 +160,7 @@ void ICACHE_FLASH_ATTR buildJsonConf(boolean remoto, boolean sendpass, boolean r
   buildvalorL(letrap,letraa,letrar,-1,remoto?peractremtemp:conf.peractrem,vacio);
   buildvalorL(letrat,letrad,letrap,-1,remoto?TempDesactPrgtemp:conf.TempDesactPrg,vacio);
   buildvalorI(letrai,letrao,letrat,-1,remoto?iottweetenabletemp:conf.iottweetenable,vacio);
-  buildvalorC(letrai,letrao,letrat,-1,remoto?iottweetusertemp:conf.iottweetuser,vacio);
+  printP(comillas,letrai,letrao,letrat,letrau,comillas); printP(dp,comillas,remoto?iottweetusertemp:conf.iottweetuser,comillas,coma);
   printP(comillas,letrai,letrao,letrat,letrak,comillas); printP(dp,comillas,remoto?iottweetkeytemp:conf.iottweetkey,comillas,coma);
   buildvalorF(letral,letraa,letrat,-1,remoto?latitudtemp:conf.latitud,6,vacio);
   buildvalorF(letral,letrao,letran,-1,remoto?longitudtemp:conf.longitud,6,vacio);
@@ -194,7 +194,7 @@ void ICACHE_FLASH_ATTR buildJsonConf(boolean remoto, boolean sendpass, boolean r
 int ICACHE_FLASH_ATTR ReqJson(int ip, int port) // pide json a remoto 
 {
   createhost(hostraiz, 1, ip);
-  msg="";
+  msg=vacio;
   printP(barra,json,interr,ori,ig);
   printI(conf.iddevice);
   return callhttpGET(host,port,true,conf.timeoutrem);
@@ -203,7 +203,7 @@ int ICACHE_FLASH_ATTR ReqJson(int ip, int port) // pide json a remoto
 int ICACHE_FLASH_ATTR ReqJsonConf(int ip, int port) // pide jsonext a remoto
 {
   createhost(hostraiz, 1, ip);
-  msg="";
+  msg=vacio;
   printP(barra,jsonconf);
   if (ip==1) printP(interr,letram,ig,uno);
   return callhttpGET(host,port,true,conf.timeoutrem);
@@ -212,27 +212,27 @@ int ICACHE_FLASH_ATTR ReqJsonConf(int ip, int port) // pide jsonext a remoto
 int ICACHE_FLASH_ATTR sendJsonConf(int ip, int port, boolean sendpass,boolean resetear) // envia json conf, recibe el comando "/rjc"->parsejconf->saveconf
 {
   createhost(hostraiz, 1, ip);
-  msg="";
+  msg=vacio;
   buildJsonConf(true,sendpass,resetear);
   
   HTTPClient http;
   http.begin(host,port,barrarjc);
-  http.addHeader(type, POST);
+  http.addHeader(type, tPOST);
   http.addHeader(contenttype, applicationjson);
   http.addHeader(dataType, json);
   http.setTimeout(conf.timeoutNTP);
   int httpCode=http.POST(msg);
   if (httpCode>0) {  msg=http.getString();  }
   http.end();
-  msg="";
+  msg=vacio;
   return httpCode;
 }
 
 int ICACHE_FLASH_ATTR sendJson(int ip, int port) // envia json al master/ o a los masters
 {
   createhost(hostraiz,1,ip);
-  msg="";
-  printP(barra,rjson,interr,data,ig);
+  msg=vacio;
+  printP(barra,rjson,interr,c(tdata),ig);
   buildJson();
   return callhttpGET(host,port,false,conf.timeoutrem);
 }
@@ -240,21 +240,25 @@ int ICACHE_FLASH_ATTR sendJson(int ip, int port) // envia json al master/ o a lo
 int ICACHE_FLASH_ATTR putmyjson() 
 {
   statusChange=false;
-  strcpy(auxchar,bins);;
-  msg="";
+  strcpy(auxchar,c(bins));;
+  msg=vacio;
   buildjsonext();
   int httpCode=0;
   HTTPClient http;
   if (conf.idmyjsonST==0)
     {
-    http.begin(myjsoncom,80,auxchar);
-    http.addHeader(type, POST);
+    Serial.print("auxchar:"); Serial.print(auxchar);Serial.print(" tPOST:"); Serial.print(tPOST);
+    Serial.print(" applicationjson:"); Serial.print(applicationjson);Serial.print(" json:"); Serial.println(json);
+    http.begin(c(myjsoncom),80,auxchar);
+    http.addHeader(type, tPOST);
     http.addHeader(contenttype, applicationjson);
-    http.addHeader(dataType, json);
+    http.addHeader(dataType, "json");
     http.setTimeout(conf.timeoutNTP);
     httpCode=http.POST(msg);
+    Serial.print("httpCode:"); Serial.print(httpCode);
+    Serial.print("  msg:"); Serial.println(msg);
     if (httpCode>0) {
-      if(httpCode == HTTP_CODE_CREATED) {
+      if(httpCode==HTTP_CODE_CREATED) {
         msg=http.getString();
         msg.substring(msg.indexOf("bins//")+6, msg.length()-2).toCharArray(conf.idmyjson,10);
         conf.idmyjsonST=1;
@@ -265,7 +269,7 @@ int ICACHE_FLASH_ATTR putmyjson()
   else
     {
     strcat(auxchar,conf.idmyjson);
-    http.begin(myjsoncom,80,auxchar);
+    http.begin(c(myjsoncom),80,auxchar);
     http.addHeader(type, PUT);
     http.addHeader(contenttype, applicationjson);
     http.addHeader(dataType, json);
@@ -274,7 +278,7 @@ int ICACHE_FLASH_ATTR putmyjson()
     msg=http.getString(); 
     }
   http.end();
-  msg="";
+  msg=vacio;
   return httpCode;
 }
 
@@ -322,7 +326,7 @@ void ICACHE_FLASH_ATTR parseJsonConf()
   hacerresetrem=extrae(false,msg,PSTR("rst")).toInt();
 
   conf.iddevice=extrae(false,msg,DV).toInt();
-  strcpy(conf.ssidAP, CONUCO); strcat(conf.ssidAP,subray); strcat(conf.ssidAP, itoa(conf.iddevice,buff,10));
+  strcpy(conf.ssidAP, c(CONUCO)); strcat(conf.ssidAP,subray); strcat(conf.ssidAP, itoa(conf.iddevice,buff,10));
   conf.EEip[3]=conf.iddevice;
   conf.wifimode=2;
   
@@ -336,7 +340,7 @@ void ICACHE_FLASH_ATTR parseJsonConf()
   conf.peractpan=extrae(false,msg,PSTR("pap")).toInt();
   conf.peractrem=extrae(false,msg,PSTR("par")).toInt();
   conf.TempDesactPrg=extrae(false,msg,PSTR("tdp")).toInt();
-  conf.iottweetenable=extrae(false,msg,PSTR("iote")).toInt();
+  conf.iottweetenable=extrae(false,msg,PSTR("iot")).toInt();
   extrae(true,msg, PSTR("iotu")).toCharArray(conf.iottweetuser,10);
   extrae(true,msg, PSTR("iotk")).toCharArray(conf.iottweetkey,15);
   conf.latitud=extrae(true,msg,PSTR("lat")).toFloat();

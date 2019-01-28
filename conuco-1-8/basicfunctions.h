@@ -17,6 +17,8 @@ template <class T> int EEPROM_readAnything(int ee, T& value)
     return i;
 }
 
+boolean strcharcomp() { msg.toLowerCase(); msg.toCharArray(auxdesc, msg.length()+1); return (strcmp(auxchar,auxdesc)==0); }
+
 char* ICACHE_FLASH_ATTR readdescr(char* namefile, byte ind, byte len)
 {
   File auxfile=SPIFFS.open(namefile,letrar);
@@ -39,13 +41,16 @@ char* ICACHE_FLASH_ATTR t(int pos)
   if (conf.lang==0) strcpy(auxlang,filespanish);
   if (conf.lang==1) strcpy(auxlang,fileenglish);
   File auxfile=SPIFFS.open(auxlang,letrar);
-  auxfile.seek(42*(pos-1), SeekSet);
-  auxfile.readBytes(auxdesc,42);
-  auxfile.close();
-  auxdesc[41]='\0';
-  byte n=strlen(auxdesc);
-  while ((n>0) && ((auxdesc[n-1]==' ')||(auxdesc[n-1]=='\n')||(auxdesc[n-1]=='\r'))) n--;
-  auxdesc[n]='\0';
+  if (auxfile)
+    {
+    auxfile.seek(42*(pos-1), SeekSet);
+    auxfile.readBytes(auxdesc,42);
+    auxfile.close();
+    auxdesc[41]='\0';
+    byte n=strlen(auxdesc);
+    while ((n>0) && ((auxdesc[n-1]==' ')||(auxdesc[n-1]=='\n')||(auxdesc[n-1]=='\r'))) n--;
+    auxdesc[n]='\0';
+    }
   return auxdesc;
 }
 
@@ -64,6 +69,24 @@ char* ICACHE_FLASH_ATTR c(int pos)
     }
   return auxdesc;
 }
+
+//char* ICACHE_FLASH_ATTR c(int pos)
+//{
+//  File auxfile=SPIFFS.open(filecommon,letrar);
+//  char auxC[42];
+//  if (auxfile)
+//    {
+//    auxfile.seek(42*(pos-1), SeekSet);
+//    auxfile.readBytes(auxC,42);
+//    auxfile.close();
+//Serial.print("auxC:");Serial.print(pos); Serial.print(" "); Serial.println(auxC);
+//    auxC[41]='\0';
+//    byte n=strlen(auxC);
+//    while ((n>0) && ((auxC[n-1]==' ')||(auxC[n-1]=='\n')||(auxC[n-1]=='\r'))) n--;
+//    auxC[n]='\0';
+//    }
+//  return auxC;
+//}
 
 void ICACHE_FLASH_ATTR savedescr(char* namefile, char* descr, byte ind, byte len)
 {
@@ -128,13 +151,6 @@ char* ICACHE_FLASH_ATTR ftoa(int valor)
 void ICACHE_FLASH_ATTR tictac(int pin, int n, int delayed)
   { for (int i=0;i<n;i++) 
     {digitalWrite(pin,1); delay(delayed); digitalWrite(pin, 0); delay(delayed);} }
-
-void ICACHE_FLASH_ATTR SerialPrint(PGM_P t1) { Serial.print(t1); }
-void ICACHE_FLASH_ATTR SerialPrint(PGM_P t1,PGM_P t2) { SerialPrint(t1); SerialPrint(t2); }
-void ICACHE_FLASH_ATTR SerialPrint(PGM_P t1,PGM_P t2,PGM_P t3) { SerialPrint(t1,t2);SerialPrint(t3); }
-void ICACHE_FLASH_ATTR SerialPrint(PGM_P t1,PGM_P t2,PGM_P t3,PGM_P t4) { SerialPrint(t1,t2);SerialPrint(t3,t4); }
-void ICACHE_FLASH_ATTR SerialPrint(PGM_P t1,PGM_P t2,PGM_P t3,PGM_P t4,PGM_P t5) { SerialPrint(t1,t2);SerialPrint(t3,t4,t5);  }
-void ICACHE_FLASH_ATTR SerialPrint(PGM_P t1,PGM_P t2,PGM_P t3,PGM_P t4,PGM_P t5,PGM_P t6) { SerialPrint(t1,t2,t3);SerialPrint(t4,t5,t6); }
 
 void ICACHE_FLASH_ATTR printconceros(int value)  { Serial.print(value<10?0:value); }
 
