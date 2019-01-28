@@ -48,8 +48,8 @@ SONG *
 PLAY *                                  
 SENSORS *                               
 DOCK                                    
-xmlns=\"http://www.w3.org/1999/xhtml\"  
-myjson.com                              
+xmlns="http://www.w3.org/1999/xhtml"    
+api.myjson.com                          
 www.iottweet.com                        
 www.google.es/maps                      
 http://www.iottweet.com                 
@@ -151,12 +151,12 @@ Reset WiFi
 Restart                                 
 rfkey                                   
 rfon                                    
-foff                                    
+rfoff                                   
 Reqjson                                 
 I2C device found at address 0x          
 Unknow error at address 0x              
 No I2C devices found                    
-<font size=6 color=\"yellow\">          
+<font size=6 color="yellow">            
 /trigger/                               
 /with/key/                              
 301                                     
@@ -181,12 +181,81 @@ CONUCO
 data                                    
 dataType                                
 ESPSESSIONID                            
-<formaction\"save\" method=\"get\">     
+<form action"save" method="get">        
 </form>                                 
 handleClient                            
 head                                    
 html                                    
 HTTP/1.1                                
+target="_blank"                         
+onclick="window.close()                 
+DISCONNECT=YES                          
+text/plain                              
+length                                  
+Location                                
+Log                                     
+MyJson Key                              
+name                                    
+no-cache                                
+<option value=                          
+</option>                               
+Page not found                          
+password                                
+<pre>                                   
+</pre>                                  
+POST                                    
+PRG                                     
+PUT                                     
+See other                               
+</select>                               
+<select name=                           
+Server                                  
+Set-Cookie                              
+table                                   
+maxlength="                             
+method="post">                          
+attachment; filename=                   
+</head>                                 
+<form action="                          
+-------libre----------------------------
+<meta http-equiv="refresh" content="    
+<font size                              
+</font>                                 
+style="color:#000000;"                  
+style="color:#ffffcc;"                  
+style="visibility: hidden"              
+IFTTT                                   
+input                                   
+Key                                     
+Show                                    
+Ver                                     
+Web                                     
+id                                      
+<td colspan="                           
+<a href="sy?act=rp                      
+title                                   
+<toff>                                  
+value                                   
+act=wc                                  
+text/text                               
+AP                                      
+AP+STA                                  
+STA                                     
+Factor                                  
+Offset                                  
+checked                                 
+<a href=                                
+selected                                
+IFTTT Key                               
+SSID                                    
+PASS                                    
+<hr>                                    
+<td></td>                               
+DHT                                     
+ON/OFF                                  
+URL                                     
+Firmware                                
+MAC                                     
                                        .
                                        .
                                        .
