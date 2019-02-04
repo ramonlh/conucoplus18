@@ -100,8 +100,8 @@ void ICACHE_FLASH_ATTR printcampoC(int numpar, char *valactual, byte tam, boolea
   printPiP(comillas,numpar, comillas);
   printP(b, tvalue, ig, comillas, valactual);
   printP(comillas,b, c(max_length));
-  printIP(tam, size_i);
-  printIP(tam, comillas);
+  printIP(tam-1, size_i);
+  printIP(tam-1, comillas);
   printfincampo();
 }
 

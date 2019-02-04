@@ -45,7 +45,7 @@ PGM_P(tpanel)="\"p\"";
 PGM_P(crlf)="\r\n";  
 PGM_P(ON)="ON"; 
 PGM_P(OFF)="OFF";
-PGM_P(celsius)="&deg;C";
+PGM_P(celsius)="&#8451;";
 PGM_P(br)="<br />";
 PGM_P(size_i)="\" size=\"";  
 PGM_P(comilla)="'";
@@ -141,7 +141,7 @@ PGM_P(cuatro)="4";
 PGM_P(cinco)="5";
 PGM_P(seis)="6";
 PGM_P(siete)="7";
-PGM_P(sumat)="Σ";
+//PGM_P(sumat)="Σ";
 PGM_P(b)=" ";
 PGM_P(coma)=",";
 PGM_P(barra)="/";
@@ -169,6 +169,10 @@ PGM_P(vacio)="";
 PGM_P(amas)="a+";
 PGM_P(rmas)="r+";
 PGM_P(wmas)="w+";
+PGM_P(symyes)="&#10004;";
+PGM_P(symnot)="&#10006;";
+PGM_P(symsum)="&#8721;";
+PGM_P(symhoz)="&#9773;";
 
 //////  No convertibles
 PGM_P(applicationjson)="application/json; charset=utf-8";
@@ -233,16 +237,6 @@ PGM_P(thtml)="html";
 PGM_P(io)="I/O";
 PGM_P(ID)="ID";
 PGM_P(ok)="OK";
-
-
-//PGM_P(iftttkeyt)="IFTTT Key";
-//PGM_P(tssid)="SSID";
-//PGM_P(tpass)="PASS";
-//PGM_P(hr)="<hr>";  
-//PGM_P(td_if)="<td></td>";
-//PGM_P(urltext)="URL";
-//PGM_P(Firmware)="Firmware";
-//PGM_P(MAC)="MAC";
 
 /// Sensores
 //PGM_P(BM1750)="BM1750";

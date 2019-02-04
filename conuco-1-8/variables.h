@@ -54,7 +54,8 @@ typedef struct {    // datos configuración
                 byte bescenaact[maxEsc][5];       // 2 x 5 = 10 bytes, activación de escenas  (valor >0, ni ON ni OFF), conjuntamente con bescena
                 byte bactfec[1]={0};              // 1 byte, por bits, uno por programa
                 byte fecsal[maxPrgFec]={0,0,0,0}; // 4 bytes, salida a actuar en cada programación por fechas
-                byte fecano[maxPrgFec]={0,0,0,0}; // 4 bytes, año menos 2000 para poder usar un byte NO USADO-DISPONIBLE
+                byte mqttsalenable[1]={0};        // publicar mqtt para cada señal.
+                byte disponible[3]={0,0,0};       // DISPONIBLE
                 byte fecmes[maxPrgFec]={0,0,0,0}; // 4 bytes, mes
                 byte fecdia[maxPrgFec]={0,0,0,0}; // 4 bytes, día del mes
                 byte fechor[maxPrgFec]={0,0,0,0}; // 4 bytes, hora
@@ -114,6 +115,7 @@ typedef struct {    // datos configuración
                 char mqttserver[40]="";           // MQTT broker
                 char mqttpath[6][10]={"","","","","",""};             // MQTT path
                 char instname[10]="";             // nombre de la instalación
+                unsigned int tempmqtt[8]={0,0,0,0,0,0,0,0};  // período de envío mqtt para cada señal
                } conftype;
 
 conftype conf;     
@@ -146,7 +148,7 @@ char fwUrlBasetemp[80]="";
 String msg;                     // String donde se construye la respuesta HTML qu e se envía al cliente
 char buff[20];                  // 20 bytes, auxiliar
 char auxchar[130];              // 130 bytes, auxiliar 
-char auxdesc[60];               // 20 bytes, auxiliar para lectura de descriptores de archivos
+char auxdesc[60];               // 60 bytes, auxiliar para lectura de descriptores de archivos
 byte addr[maxTemp][8];          // 3x8, 24 bytes identificador de cada sonda DS18B20 (64)
 int peractpantemp=10;           // 2 período de actualización automática página panel
 int peractremtemp=10;           // 2 período de actualización automática a nodo raíz
@@ -242,6 +244,7 @@ byte paract=0;
 float dhtdata[2][2];
 byte panelact=0;
 byte prisalrem=0;
+byte priremio=0;
 byte hacerresetrem=0;
 long lastReconnectAttempt=0;
 boolean pendsave = false;

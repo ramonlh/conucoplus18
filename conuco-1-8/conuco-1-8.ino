@@ -202,8 +202,8 @@ int ICACHE_FLASH_ATTR postdweet(char* key)
 int ICACHE_FLASH_ATTR ifttttrigger(char *evento, char* key, char* value1, char* value2, char* value3)
 {
   if (conf.iftttenable == 0) return 0;
-  strcpy(auxchar, c(trigger)); strcat(auxchar, evento); // value1, 2 y 3 tamaño máximo = 20
-  strcat(auxchar, c(withkey)); strcat(auxchar, key); strcat(auxchar, interr);
+  strcpy(auxchar, "/trigger/"); strcat(auxchar, evento); // value1, 2 y 3 tamaño máximo = 20
+  strcat(auxchar, "/with/key/"); strcat(auxchar, key); strcat(auxchar, interr);
   strcat(auxchar, tvalue); strcat(auxchar, uno); strcat(auxchar, ig); strcat(auxchar, value1); strcat(auxchar, ampersand);
   strcat(auxchar, tvalue); strcat(auxchar, dos); strcat(auxchar, ig); strcat(auxchar, value2); strcat(auxchar, ampersand);
   strcat(auxchar, tvalue); strcat(auxchar, tres); strcat(auxchar, ig); strcat(auxchar, value3);
@@ -236,6 +236,7 @@ void ICACHE_FLASH_ATTR pinVAL(byte n, byte value, byte ori)
 
 int ICACHE_FLASH_ATTR pinvalR(byte ip, int port, byte pin, byte valor) // ejecuta comando remoto
 {
+  
   createhost(hostraiz,conf.netseg,ip);
   msg=vacio;
   printP(barra, valor?on:off, interr, letrap, ig, itoa(pin+12,buff,10));
@@ -938,7 +939,7 @@ void ICACHE_FLASH_ATTR jsonconfHTML() {
   if (server.args() > 0)
     if (server.argName(0) == letrar) AddOri(server.arg(0).toInt());
   msg=vacio;
-  buildJsonConf(false, server.argName(0) == letram, false);
+  buildJsonConf(false, server.argName(0)==letram, false);
   serversend200();
 }
 
@@ -977,7 +978,6 @@ void ICACHE_FLASH_ATTR initPRG(void)
   memset(conf.fecsal, 0, sizeof(conf.fecsal));
   memset(conf.fecdia, 0, sizeof(conf.fecdia));
   memset(conf.fecmes, 0, sizeof(conf.fecmes));
-  memset(conf.fecano, 0, sizeof(conf.fecano));
   memset(conf.fechor, 0, sizeof(conf.fechor));
   memset(conf.fecmin, 0, sizeof(conf.fecmin));
   memset(conf.bfecval, 0, sizeof(conf.bfecval));
@@ -1020,7 +1020,7 @@ void ICACHE_FLASH_ATTR setupremHTML()
     {
     for (byte i=0; i<maxdevrem; i++)
       { strcpy(auxdesc, vacio); savedescr(fileidmyjsonrem, auxdesc, i, 10);
-      strcpy(auxdesc, vacio);  savedescr(filemacdevrem, auxdesc, i, 14);
+        strcpy(auxdesc, vacio);  savedescr(filemacdevrem, auxdesc, i, 14);
       }
     for (int i=0; i<server.args(); i++)
       {
@@ -1044,12 +1044,12 @@ void ICACHE_FLASH_ATTR setupremHTML()
   printP(td, t(ttipo), td_f);
   printP(td, t(configuracion), td_f, td, c(salremotas), td_f);
   printP(tr_f);
-  for (byte  i=0; i<maxdevrem; i++)
-  {
+  for (byte i=0; i<maxdevrem; i++)
+    {
     mpi=mp*i;
     colorea = (posactrem == i);
     printP(tr);
-    if (posactrem == i)   {
+    if (posactrem==i)   {
       printP(colorea ? th : td);
       printcampoI(mpi + 1, conf.idremote[i], 3, true);
       printP(colorea ? th_f : td_f);
@@ -1057,20 +1057,24 @@ void ICACHE_FLASH_ATTR setupremHTML()
     else
       {
       strcpy(auxchar, slkhtm); strcat(auxchar, igualp); strcat(auxchar, itoa(i, buff, 10));
-      printOpc(false, false, (conf.idremote[i]==0) ? c(notdefined):itoa(conf.idremote[i], buff, 10), auxchar);
+      printOpc(false, false, (conf.idremote[i]==0)?c(notdefined):itoa(conf.idremote[i],buff,10), auxchar);
       }
 
-    if (conf.idremote[i] != 0)
+    if (conf.idremote[i]!=0)
       {
       if ((conf.idremote[i] >= 150) && (conf.idremote[i] <= 166)) { // conuco
-        printP(td, href_i, comillas);
-        printP(c(thttp));
-        printP(hostraiz);
-        printIP(conf.netseg,punto);
-        printIP(conf.idremote[i], dp);
-        printI(88);
-        printP(comillas, b, c(newpage), mayor);
-        printP(c(conuco), href_f);
+        printP(td);
+        if (!clientremote())
+          {
+          printP(href_i, comillas);
+          printP(c(thttp));
+          printP(hostraiz);
+//          printIP(conf.netseg,punto);
+          printIP(conf.idremote[i], dp);
+          printI(88);
+          printP(comillas, b, c(newpage), mayor);
+          printP(c(conuco), href_f);
+          }
         printP(td_f,td, href_i, comillas, sdremhtm, interr);
         printPiP(c(trem), conf.idremote[i], comillas);
         printP(b, c(newpage), mayor);
@@ -1135,7 +1139,7 @@ void ICACHE_FLASH_ATTR setupsalremHTML()
   prisalrem = constrain(server.arg(0).toInt(), 0, 24);
   posactsalrem = constrain(server.arg(1).toInt(), 0, 32);
   if (server.method() == HTTP_POST)
-  {
+    {
     for (int i=0; i<server.args(); i++)
       {
       calcindices(i);
@@ -1162,7 +1166,7 @@ void ICACHE_FLASH_ATTR setupsalremHTML()
     strcat(auxchar, igualp); strcat(auxchar, itoa(prisalrem, buff, 10));
     strcat(auxchar, amper); strcat(auxchar, letran); strcat(auxchar, ig); strcat(auxchar, itoa(posactsalrem, buff, 10));
     sendOther(auxchar,-1);  return;
-  }
+    }
 
   writeHeader(false,false);
   writeMenu(3, 11);
@@ -1299,47 +1303,50 @@ void ICACHE_FLASH_ATTR setupioHTML()
   printremote();
   if (!autOK()) { sendOther(loghtm,-1); return; }
   msg=vacio;
-  mp=6;  // número de parámetros por fila
-  if (server.method() == HTTP_POST)
-  {
-    if ((posactio >= 4) && (posactio <= 5)) { setbit8(conf.iftttpinED, posactio-4,0); setbit8(conf.iftttpinED, posactio+4,0); }
-    if ((posactio >= 6) && (posactio <= 7)) { setbit8(conf.iftttpinSD, posactio-6,0); setbit8(conf.iftttpinSD, posactio+2,0); }
-    for (int i = 0  ; i < server.args(); i++)
+  mp=8;  // número de parámetros por fila
+  if (server.method()==HTTP_POST)
+    {
+    if ((posactio>=4) && (posactio<=5)) { setbit8(conf.iftttpinED, posactio-4,0); setbit8(conf.iftttpinED, posactio+4,0); }
+    if ((posactio>=6) && (posactio<=7)) { setbit8(conf.iftttpinSD, posactio-6,0); setbit8(conf.iftttpinSD, posactio+2,0); }
+    setbit8(conf.mqttsalenable,posactio,0);
+    for (int i=0  ;i<server.args(); i++)
       {
       calcindices(i);
-      if (indice <= 2)  // temperaturas
+      if (resto==6) { setbit8(conf.mqttsalenable,indice,1); }
+      if (resto==7) { conf.tempmqtt[indice]=server.arg(i).toInt(); }
+      if (indice<=2)  // temperaturas
         {
         if (resto==0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
         else if (resto==1) conf.setpoint[indice]=server.arg(i).toFloat();  // valor consigna
         else if (resto==2) conf.salsetpoint[indice]=server.arg(i).toInt(); // salida asociada
         else if (resto==3) conf.accsetpoint[indice]=server.arg(i).toInt(); // acción consigna
         }
-      else if (indice == 3) // entrada analógica
+      else if (indice==3) // entrada analógica
         {
-        if (resto == 0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
-        else if (resto == 1) { server.arg(i).toCharArray(conf.unitpinA, 4); } // unidades
-        else if (resto == 2) conf.factorA[indice - 3] = server.arg(i).toFloat();
-        else if (resto == 3) conf.offsetA[indice - 3] = server.arg(i).toFloat();
-        else if (resto == 4) setbit8(conf.bsumatA, indice - 3, 1); // Mostrar si/no suma
+        if (resto==0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
+        else if (resto==1) { server.arg(i).toCharArray(conf.unitpinA, 4); } // unidades
+        else if (resto==2) conf.factorA[indice - 3] = server.arg(i).toFloat();
+        else if (resto==3) conf.offsetA[indice - 3] = server.arg(i).toFloat();
+        else if (resto==4) setbit8(conf.bsumatA, indice - 3, 1); // Mostrar si/no suma
         }
-      else if ((indice >= 4) && (indice <= 5)) // entradas digitales
+      else if ((indice>=4) && (indice <= 5)) // entradas digitales
         {
-        if (resto == 0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
-        else if (resto == 1) conf.tipoED[indice - 4] = server.arg(i).toInt();
-        else if (resto == 4) setbit8(conf.iftttpinED, indice - 4, server.arg(i).toInt()); // Notificar si/no
-        else if (resto == 5) setbit8(conf.iftttpinED, indice - 4 + 8, server.arg(i).toInt()); // Notificar si/no
+        if (resto==0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
+        else if (resto==1) conf.tipoED[indice - 4] = server.arg(i).toInt();
+        else if (resto==4) setbit8(conf.iftttpinED, indice - 4, server.arg(i).toInt()); // Notificar si/no
+        else if (resto==5) setbit8(conf.iftttpinED, indice - 4 + 8, server.arg(i).toInt()); // Notificar si/no
         }
-      else if ((indice >= 6) && (indice <= 7)) // salidas digitales
+      else if ((indice>=6) && (indice <= 7)) // salidas digitales
         {
-        if (resto == 0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
-        else if (resto == 1) conf.valinic[indice-6] = server.arg(i).toInt();            // valor inicial
-        else if (resto == 2) conf.tempdefact[indice-6] = server.arg(i).toInt();         // Seg. ON
-        else if (resto == 3) conf.tempdefdes[indice-6] = server.arg(i).toInt();         // Seg. OFF
-        else if (resto == 4) setbit8(conf.iftttpinSD, indice-6, server.arg(i).toInt()); // Notificar si/no
-        else if (resto == 5) setbit8(conf.iftttpinSD, indice+2, server.arg(i).toInt()); // Notificar si/no
+        if (resto==0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
+        else if (resto==1) conf.valinic[indice-6] = server.arg(i).toInt();            // valor inicial
+        else if (resto==2) conf.tempdefact[indice-6] = server.arg(i).toInt();         // Seg. ON
+        else if (resto==3) conf.tempdefdes[indice-6] = server.arg(i).toInt();         // Seg. OFF
+        else if (resto==4) setbit8(conf.iftttpinSD, indice-6, server.arg(i).toInt()); // Notificar si/no
+        else if (resto==5) setbit8(conf.iftttpinSD, indice+2, server.arg(i).toInt()); // Notificar si/no
           }
         }
-    if (conf.modoterm == 1) { conf.tempdefact[0] = 0; conf.tempdefdes[0] = 0;  }
+    if (conf.modoterm==1) { conf.tempdefact[0] = 0; conf.tempdefdes[0] = 0;  }
     saveconf();
     sendOther(siohtm,-1); return;
     }
@@ -1348,7 +1355,13 @@ void ICACHE_FLASH_ATTR setupioHTML()
   writeMenu(3,1);
   writeForm(siohtm);
 
-  printP(tr,td,t(descripcion),td_f,tr_f);
+  printP(tr,td,t(descripcion),td_f);
+  printColspan(2);
+  printP(PSTR("MQTT"),td_f);
+  printP(td,t(consigna),td_f);
+  printP(td,t(salida),td_f);
+  printColspan(2); printP(PSTR("ON/OFF"),td_f);
+  printP(tr_f);
   for (byte i=0; i<8; i++)
     {
     printP(tr);
@@ -1370,19 +1383,24 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printP(td_f);
 
         printP(td);
-        printP(t(consigna));
+        checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)));
+        printP(td_f);
+        printP(td);
+        printcampoI(mpi+7,conf.tempmqtt[i],5,true);
+        printP(td_f);
+
+        printP(td);
         printcampoF(mpi+1, conf.setpoint[i], 1); // valor de consigna
         printP(td_f);
 
         printP(td);
-        printP(t(salida));
         printP(c(Select_name),comillas);
         printI(mpi+2);
         printP(comillas, mayor);       // señal de salida
-        for (byte j=0; j < maxSD; j++)   { // salidas digitales locales
+        for (byte j=0; j<maxSD; j++)   { // salidas digitales locales
           printP(c(optionvalue));
           printPiP(comillas, j, comillas);
-          if (conf.salsetpoint[i] == j) printP(b, selected, ig, comillas, selected, comillas);
+          if (conf.salsetpoint[i]==j) printP(b, selected, ig, comillas, selected, comillas);
           if (conf.showN) printPiP(mayorparen, j, parenguion); else printP(mayor);
           printP(readdescr(filedesclocal,j+6,20));
           printP(c(option_f));
@@ -1411,7 +1429,6 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printP(td_f);
         
         printColspan(2);
-        printP("ON/OFF");
         printP(c(Select_name),comillas);
         printIP(mpi+3, comillas);
         printP(mayor);
@@ -1428,13 +1445,28 @@ void ICACHE_FLASH_ATTR setupioHTML()
         readdescr(filedesclocal,i,20);
         strcpy(auxchar, siohtm); strcat(auxchar, igualp); strcat(auxchar,itoa(i,buff,10));
         printOpc(false, false, auxdesc);
-        printColspan(4);
-        for (byte j=0; j<8; j++) {printH(addr1Wire[i][j]);printP(b);}
+
+        printP(td,getbit8(conf.mqttsalenable,i)?symyes:symnot,td_f);
+        printP(td); printI(conf.tempmqtt[i]); printP(td_f);
+        
+        printP(td); printF(conf.setpoint[i],2); printP(td_f);
+        printP(td); 
+        if (conf.salsetpoint[i]<2)       printP(readdescr(filedesclocal,conf.salsetpoint[i]+6,20));  
+        else if (conf.salsetpoint[i]<10) printP(readdescr(filedescesc, conf.salsetpoint[i]-2, 20));
+        else if (conf.salsetpoint[i]<10) printP(readdescr(filesalrem,conf.salsetpoint[i]-10,20));
+        printP(td_f);
+        printColspan(2);
+        printP(conf.accsetpoint[i]==0?guion:conf.accsetpoint[i]==1?OFF:ON,td_f);
+
+        
+//        printColspan(4);
+//        for (byte j=0; j<8; j++) {printH(addr1Wire[i][j]);printP(b);}
         }
       printP(td_f, tr_f);
       }
     if (i==3) // entrada analógica
       {
+      espacioSep(7);
       if  (posactio==i)
         {
         printP(td, menor, c(tinput), b, type, ig);
@@ -1447,8 +1479,16 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printIP(19, size_i);
         printI(19);
         printP(comillas, mayor, menor, barra, c(tinput), mayor);
-        printP(td_f, td, c(unit), b);
-  
+        printP(td_f);
+
+        printP(td);
+        checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)));
+        printP(td_f);
+        printP(td);
+        printcampoI(mpi+7,conf.tempmqtt[i],5,true);
+        printP(td_f);
+
+        printP(td, c(unit), b);
         printP(menor, c(tinput), b, type, ig);
         printP(comillas, c(ttext), comillas, b);
         printP(c(namet), ig);
@@ -1464,7 +1504,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printP(td_f, td, c(offset), b);
         printcampoF(mpi + 3, conf.offsetA[i - 3], 5);
         colorea = getbit8(conf.bsumatA, i - 3);
-        printP(td_f, td, sumat, b);
+        printP(td_f, td, symsum, b);
         checkBox(mpi+4, (getbit8(conf.bsumatA, i - 3)));
         }
       else
@@ -1472,11 +1512,19 @@ void ICACHE_FLASH_ATTR setupioHTML()
         readdescr(filedesclocal,i,20);
         strcpy(auxchar, siohtm); strcat(auxchar, igualp); strcat(auxchar, itoa(i, buff, 10));
         printOpc(false, false, auxdesc);
+  
+        printP(td);
+        printP(getbit8(conf.mqttsalenable,i)?symyes:symnot);
+        printP(td_f);
+        printP(td);
+        printI(conf.tempmqtt[i]);
+        printP(td_f);
+        
         printP(td, conf.unitpinA, td_f, td);
         printF(conf.factorA[i-3], 5);
         printP(td_f, td);
         printF(conf.offsetA[i-3], 5);
-        printP(td_f, td, getbit8(conf.bsumatA,i-3)?c(si):guion);
+        printP(td_f, td, getbit8(conf.bsumatA,i-3)?symyes:symnot);
         }
       printP(td_f, tr_f);
       }
@@ -1497,7 +1545,16 @@ void ICACHE_FLASH_ATTR setupioHTML()
           printIP(19, size_i);
           printI(19);
           printP(comillas, mayor, menor, barra, c(tinput), mayor);
-          printP(td_f, td, t(ttipo), b);
+          printP(td_f);
+  
+          printP(td);
+          checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)));
+          printP(td_f);
+          printP(td);
+          printcampoI(mpi+7,conf.tempmqtt[i],5,true);
+          printP(td_f);
+        
+          printP(td, t(ttipo), b);
           printcampoCB(mpi + 1, conf.tipoED[i - 4], ONOFF, dhtt);
           printP(td_f);
           printColspan(2);
@@ -1511,10 +1568,18 @@ void ICACHE_FLASH_ATTR setupioHTML()
           readdescr(filedesclocal,i,20);
           strcpy(auxchar, siohtm); strcat(auxchar, igualp); strcat(auxchar, itoa(i, buff, 10));
           printOpc(false, false, auxdesc);
+  
+          printP(td);
+          printP(getbit8(conf.mqttsalenable,i)?symyes:symnot);
+          printP(td_f);
+          printP(td);
+          printI(conf.tempmqtt[i]);
+          printP(td_f);
+        
           printP(td, conf.tipoED[i - 4] == 0 ? ONOFF : dhtt, colorea ? th_f : td_f);
           printColspan(2);
-          printP(td, getbit8(conf.iftttpinED,i-4)?c(si):guion);
-          printP(barra, getbit8(conf.iftttpinED,i+4)?c(si):guion);
+          printP(td, getbit8(conf.iftttpinED,i-4)?symyes:symnot);
+          printP(barra, getbit8(conf.iftttpinED,i+4)?symyes:symnot);
           }
         printP(td_f,tr_f);
         }
@@ -1524,8 +1589,8 @@ void ICACHE_FLASH_ATTR setupioHTML()
       if (posactio==i) 
         {
         printP(td, menor, c(tinput), b, type, ig);
-      printP(comillas, c(ttext), comillas, b);
-      printP(c(namet), ig);
+        printP(comillas, c(ttext), comillas, b);
+        printP(c(namet), ig);
         printPiP(comillas, mpi, comillas);
         printP(b, tvalue, ig, comillas);
         printP(readdescr(filedesclocal, i, 20));
@@ -1533,7 +1598,16 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printIP(19, size_i);
         printI(19);
         printP(comillas, mayor, menor, barra, c(tinput), mayor);
-        printP(td_f, td, c(defaultt), b);
+        printP(td_f);
+  
+        printP(td);
+        checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)));
+        printP(td_f);
+        printP(td);
+        printcampoI(mpi+7,conf.tempmqtt[i],5,true);
+        printP(td_f);
+        
+        printP(td, c(defaultt), b);
         printcampoCB(mpi + 1, conf.valinic[i - 6], OFF, ON, t(ultimovalor));
         printP(td_f, td, c(tdefact), b);
         printcampoL(mpi+2, conf.tempdefact[i - 6], 8, true);
@@ -1550,10 +1624,18 @@ void ICACHE_FLASH_ATTR setupioHTML()
         readdescr(filedesclocal,i,20);
         strcpy(auxchar, siohtm); strcat(auxchar, igualp); strcat(auxchar, itoa(i, buff, 10));
         printOpc(false, false, auxdesc);
+  
+        printP(td);
+        printP(getbit8(conf.mqttsalenable,i)?symyes:symnot);
+        printP(td_f);
+        printP(td);
+        printI(conf.tempmqtt[i]);
+        printP(td_f);
+        
         printP(td, conf.valinic[i-6]==0?OFF : conf.valinic[i - 6] == 1 ? ON : t(ultimovalor), td_f);
         printPiP(td, conf.tempdefact[i-6], td_f);
         printPiP(td, conf.tempdefdes[i-6], td_f);
-        printP(td, getbit8(conf.iftttpinSD,i-6)?c(si):guion, barra, getbit8(conf.iftttpinSD,i+2)?c(si):guion);
+        printP(td, getbit8(conf.iftttpinSD,i-6)?symyes:symnot, barra, getbit8(conf.iftttpinSD,i+2)?symyes:symnot);
         }
       printP(td_f, tr_f);
       }
@@ -1638,7 +1720,7 @@ void ICACHE_FLASH_ATTR setupDevHTML()
   printP(c(Firmware), b);
   printP(c(tserver), href_f, td_f);
   printColspan(3);
-  printcampoC(18, conf.fwUrlBase, 49, true, true, false);  printP(td_f, tr_f);
+  printcampoC(18, conf.fwUrlBase, 50, true, true, false);  printP(td_f, tr_f);
 
   printP(tr, td, t(periodoact255), barra);
   printP(t(periodoactrem), barra);
@@ -1927,10 +2009,8 @@ void ICACHE_FLASH_ATTR setupNetServHTML()
     printColspan(2);
     if (i==0) { printP(c(mqtt),b); printP(c(tpath)); }
     printP(td_f,td);
-//    printcampoC(11+(i*2), conf.mqttpath[i*2], 10, true, (i*2>=6), false);
     printcampoC(11+(i*2), conf.mqttpath[i*2], 10, true, true, false);
     printP(barra,td_f,td);
-//    printcampoC(12+(i*2), conf.mqttpath[i*2+1], 10, true, (i*2>=6), false);
     printcampoC(12+(i*2), conf.mqttpath[i*2+1], 10, true, true, false);
     printP(barra,td_f,tr_f); 
     }
@@ -2123,8 +2203,8 @@ void ICACHE_FLASH_ATTR extraevaloresTempConf(boolean withpass)
     extrae(true, msg, PSTR("ps")).toCharArray(passSTAtemp, 20);
     }
   iddevicetemp = extrae(false, msg, PSTR("DV")).toInt();
-  extrae(true, msg, PSTR("al")).toCharArray(aliasdevicetemp, 20);
   versinsttemp = extrae(false, msg, PSTR("v")).toInt();
+  extrae(true, msg, PSTR("al")).toCharArray(aliasdevicetemp, 20);
   actualizauttemp = extrae(false, msg, PSTR("aa")).toInt();
   iftttenabletemp = extrae(false, msg, PSTR("if")).toInt();
   extrae(true, msg, PSTR("k")).toCharArray(iftttkeytemp, 30);
@@ -2140,11 +2220,9 @@ void ICACHE_FLASH_ATTR extraevaloresTempConf(boolean withpass)
   extrae(true, msg, PSTR("iotk")).toCharArray(iottweetkeytemp, 15);
   latitudtemp = extrae(true, msg, PSTR("lat")).toFloat();
   longitudtemp = extrae(true, msg, PSTR("lon")).toFloat();
-
-  for (byte i=0;i<2;i++) { extrae(true,msg,idpin[i]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i,20); }
-  for (byte i=0;i<1;i++) { extrae(true,msg,idpin[i+4]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i+4,20); }
-  for (byte i=0;i<1;i++) { extrae(true,msg,idpin[i+6]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i+6,20); }
-
+  for (byte i=0;i<3;i++) { extrae(true,msg,idpin[i]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i,20); }
+  for (byte i=0;i<2;i++) { extrae(true,msg,idpin[i+4]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i+4,20); }
+  for (byte i=0;i<2;i++) { extrae(true,msg,idpin[i+6]).toCharArray(auxdesc,20); savedescr(filedesctemp,auxdesc,i+6,20); }
   extrae(true, msg, PSTR("ad0")).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 3, 20);
   extrae(true, msg, PSTR("au0")).toCharArray(unitpinAtemp, 4);
   factorAtemp[0] = extrae(true, msg, PSTR("af0")).toFloat();
@@ -2172,7 +2250,7 @@ void ICACHE_FLASH_ATTR setupdev150HTML()
   if (!autOK()) { sendOther(loghtm,-1); return; }
 
   if (server.method()==HTTP_POST)
-  {
+    {
     hacerresetrem = 0;
     sendOther(slkhtm,-1);
     for (byte i = 0; i<server.args(); i++)
@@ -2185,40 +2263,34 @@ void ICACHE_FLASH_ATTR setupdev150HTML()
       if (server.argName(i).toInt()==5) hacerresetrem=server.arg(i).toInt();
       }
     /////////////////////////////////
-    // conectar a red conuco150
-    conf.staticIP = 1;
-    conf.EEip = {192,168,4,9}; conf.EEip[3]=9;
-    conf.EEgw = {192,168,4,1};
+    // conectar a red conuco150del nuevo AP
+    conf.staticIP=1;
+    conf.EEip= {192,168,4,9}; conf.EEip[3]=9;
+    conf.EEgw={192,168,4,1};
     WiFi.config(conf.EEip, conf.EEgw, conf.EEmask, conf.EEdns, conf.EEdns2);
     WiFi.begin("CONUCO_150", t12341234, true);
     byte cont = 0;
     dPrint(t(conectando)); dPrint(b); dPrint(WiFi.SSID()); dPrint(barra); dPrint(WiFi.psk()); dPrint(b);
-    while ((!WiFi.isConnected()) && (cont++ < 20))  {
-      delay(1000);
-      dPrint(punto);
-    }
+    while ((!WiFi.isConnected()) && (cont++ < 20))  { delay(1000); dPrint(punto);  }
     dPrint(crlf); dPrint(t(tconectado)); dPrint(b); dPrint(WiFi.isConnected() ? ok : c(terror)); dPrint(crlf);
     dPrint(c(IP)); Serial.print(WiFi.localIP()); dPrint(crlf);
 
     if (WiFi.isConnected())
-    {
+      {
       // enviar nuevos datos
       sendJsonConf(1, 88, true, hacerresetrem == 1); // envia jsonConf al remoto para configurar y guardar, incluído ssid y pass
       hacerresetrem = 0;
-    }
+      }
     else
       {Serial.print(t(NO)); Serial.print(b);Serial.print(t(tconectado));}
     // volver a red original
-    conf.EEip = {192, 168, 1, 150};  conf.EEip[3] = conf.iddevice;
-    conf.EEgw = {192, 168, 1, 1};
+    conf.EEip={192,168,1,150};  conf.EEip[3] = conf.iddevice;
+    conf.EEgw={192,168,1,1};
     WiFi.config(conf.EEip, conf.EEgw, conf.EEmask, conf.EEdns, conf.EEdns2);
     WiFi.begin(conf.ssidSTA, conf.passSTA, true);
     cont = 0;
     dPrint(t(conectando)); dPrint(b); dPrint(WiFi.SSID()); dPrint(barra); dPrint(WiFi.psk()); dPrint(b);
-    while ((!WiFi.isConnected()) && (cont++ < 20))  {
-      delay(1000);
-      dPrint(punto);
-    }
+    while ((!WiFi.isConnected()) && (cont++ < 20))  { delay(1000); dPrint(punto); }
     dPrint(crlf); dPrint(t(tconectado)); dPrint(b); dPrint(WiFi.isConnected() ? ok : c(terror)); dPrint(crlf);
     dPrint(c(IP)); Serial.print(WiFi.localIP()); dPrint(crlf);
     ////////////////////////////////
@@ -2226,7 +2298,7 @@ void ICACHE_FLASH_ATTR setupdev150HTML()
     delay(10000);
     sendOther(slkhtm,-1);
     return;
-  }
+    }
 
   if (server.argName(0).compareTo(PSTR("r")) == 0)
     if (server.arg(0).toInt() == 1)
@@ -2241,10 +2313,7 @@ void ICACHE_FLASH_ATTR setupdev150HTML()
       WiFi.begin("CONUCO_150", t12341234, true);
       byte cont = 0;
       dPrint(t(conectando)); dPrint(b); dPrint(WiFi.SSID()); dPrint(barra); dPrint(WiFi.psk()); dPrint(b);
-      while ((!WiFi.isConnected()) && (cont++ < 20))  {
-        delay(1000);
-        dPrint(punto);
-      }
+      while ((!WiFi.isConnected()) && (cont++ < 20))  {delay(1000); dPrint(punto); }
       dPrint(crlf); dPrint(t(tconectado)); dPrint(b); dPrint(WiFi.isConnected()?ok:c(terror)); dPrint(crlf);
       dPrint(c(IP)); Serial.print(WiFi.localIP()); dPrint(crlf);
 
@@ -2256,10 +2325,7 @@ void ICACHE_FLASH_ATTR setupdev150HTML()
         if (auxerr == HTTP_CODE_OK) extraevaloresTempConf(true);
         msg=vacio;
         }
-      else {
-        Serial.print(t(NO));
-        Serial.print(b);
-        Serial.print(t(tconectado));  }
+      else { Serial.print(t(NO));  Serial.print(b); Serial.print(t(tconectado));  }
       // volver a red original
       conf.iddevice = auxdevice;
       conf.EEip = {192, 168, 1, 150};  conf.EEip[3] = conf.iddevice;
@@ -2290,7 +2356,7 @@ void ICACHE_FLASH_ATTR setupdev150HTML()
   printcampoC(2, conf.ssidSTA, 20, true, true, false);  printP(td_f, tr_f);
   printP(tr, td, c(tpass), td_f, td);
   printcampoC(3, conf.passSTA, 20, true, true, true);  printP(td_f, tr_f);
-  printP(tr, td, treset, interr, td_f, td);
+  printP(tr, td, treset, td_f, td);
   checkBox(5, hacerresetrem);  printP(td_f, tr_f);
   writeFooter(tguardar, false);
   serversend200();
@@ -2321,7 +2387,7 @@ void ICACHE_FLASH_ATTR setupDevRemHTML()
     } 
   msg=vacio;
   mp=1;
-  if (server.method() == HTTP_POST)
+  if (server.method()==HTTP_POST)
     {
     mododweettemp=0; iftttenabletemp=0; modomyjsontemp=0; iottweetenabletemp=0;
     actualizauttemp=0;
@@ -2387,7 +2453,7 @@ void ICACHE_FLASH_ATTR setupDevRemHTML()
     printP(c(Firmware), b);
     printP(c(tserver), td_f);
     printColspan(3);
-    printcampoC(10, fwUrlBasetemp, 49, true, true, false);
+    printcampoC(10, fwUrlBasetemp, 50, true, true, false);
     printP(td_f, tr_f, tr, td, t(periodoact255));
 
     printP(barra, t(periodoactrem), barra, t(tdp), td_f, td);
@@ -2461,29 +2527,22 @@ void ICACHE_FLASH_ATTR setupDevRemioHTML()
         {
         strcpy(auxdesc, aliasdevicetemp);  savedescr(filedevrem, auxdesc, posdevice, 20);
         for (byte j=0; j<maxsalrem; j++)
-          {
           if (conf.idsalremote[j] == conf.idremote[posdevice])
-            {
             if ((conf.senalrem[j] >= 0) && (conf.senalrem[j] <= 7))
-              {
-              readdescr(filedesctemp, conf.senalrem[j], 20);
-              savedescr(filesalrem, auxdesc, j, 20);
-              }
-            }
-          }
+              { readdescr(filedesctemp, conf.senalrem[j], 20); savedescr(filesalrem, auxdesc, j, 20); }
         saveconf();
         }
+      }
     }
-  }
   msg=vacio;
   mp=1;
   if (server.method()==HTTP_POST)
-  {
+    {
     iftttpinEDtemp[0]=0; iftttpinSDtemp[0]=0;
     iftttpinEDtemp[1]=0; iftttpinSDtemp[1]=0;
     bsumatAtemp[0] = 0;
     for (int i = 0; i < server.args(); i++)
-    {
+      {
       calcindices(i);
       if (param_number==0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesctemp, auxdesc, 0, 20); }
       else if (param_number==5) { server.arg(i).toCharArray(auxdesc, 20);  savedescr(filedesctemp, auxdesc, 1, 20); }
@@ -2511,19 +2570,20 @@ void ICACHE_FLASH_ATTR setupDevRemioHTML()
       else if (param_number==38) { tempdefdestemp[1] = server.arg(i).toInt(); }
       else if (param_number==39) { setbit8(iftttpinSDtemp, 1, 1); }
       else if (param_number==139) { setbit8(iftttpinSDtemp, 9, 1); }
-    }
+      }
     sendJsonConf(iddevicetemp, 88, false, false); // envia jsonConf al remoto para configurar
     strcpy(auxchar, sdremiohtm);  strcat(auxchar, interr); strcat(auxchar, c(trem));
     strcat(auxchar, itoa(iddevicetemp, buff, 10));
     sendOther(auxchar,-1);   // "sdrem?rem=xxx";
     return;
-  }
+    }
 
+  if (server.args()>1) { priremio = constrain(server.arg(1).toInt(),0,7); }
   writeHeader(false,false);
   writeMenu(3, 5);
   writeForm(sdremiohtm);
 
-  if (auxerr != HTTP_CODE_OK)
+  if (auxerr!=HTTP_CODE_OK)
     {
     printP(t(noconf), menor, barra);
     printP(table, mayor);
@@ -2534,120 +2594,206 @@ void ICACHE_FLASH_ATTR setupDevRemioHTML()
   else
     {
     printP(tr);
-    printP(td, t(dispositivo), barra, c(alias), td_f, td);
-    printcampoL(2, iddevicetemp, 3, true);
+    printP(td, t(dispositivo), barra);
+    printP(c(alias), td_f, td);
+    printI(iddevicetemp);
     printP(guion, aliasdevicetemp, td_f, tr_f);
 
-    printP(tr, td, t(sonda), b, uno, barra);
-    printP(dos, barra, tres, td_f);
-    for (byte i = 0; i < maxTemp; i++)
+    for (byte i=0; i<maxTemp; i++)
       {
-      if (i == 0) printP(td); else printColspan(2);
-      printP(menor, c(tinput), b, type, ig);
-      printP(comillas, c(ttext), comillas, b);
-      printP(c(namet), ig);
-      printPiP(comillas, i * 5, comillas);
-      printP(b, tvalue, ig, comillas);
-      printP(readdescr(filedesctemp, i, 20));
-      printP(comillas,b,c(max_length));
-      printIP(19, size_i);
-      printI(19);
-      printP(comillas, mayor, menor, barra, c(tinput), mayor);
-      printP(td_f);
-      }
-    printP(tr_f,tr, td, t(entanalog));
-    printPiP(b, 1, td_f);
-
-    printP(td, menor, c(tinput), b, type, ig);
-    printP(comillas, c(ttext), comillas, b);
-    printP(c(namet), ig);
-    printPiP(comillas, 15, comillas);
-    printP(b, tvalue, ig, comillas);
-    printP(readdescr(filedesctemp, 3, 20));
-    printP(comillas,b,c(max_length));
-    printIP(19, size_i);    
-    printI(19);
-    printP(comillas, mayor, menor, barra, c(tinput), mayor);
-    printP(td_f, td);
-
-    printP(t(units), menor);
-    printP(c(tinput), b, type, ig);
-    printP(comillas,c(ttext), comillas, b);
-    printP(c(namet));
-    printP(ig);
-    printPiP(comillas, 16, comillas);
-    printP(b, tvalue, ig, comillas, unitpinAtemp);
-    printP(comillas,b,c(max_length));
-    printIP(3, size_i); printI(3);
-    printP(comillas, mayor, menor, barra, c(tinput), mayor);
-    printP(td_f, td, c(factor));
-    printcampoF(17, factorAtemp[0], 5);
-    printP(td_f, td, c(offset));
-    printcampoF(18, offsetAtemp[0], 5);
-    printP(td, sumat);
-    checkBox(19, (getbit8(bsumatAtemp, 0)));
-    printP(td_f, tr_f);
-
-    if (modo45temp == 0)
-      for (byte i = 0; i < maxED; i++) // entradas digitales
-      {
-        printP(tr, td, t(entradasdig), b);
-        printI(i + 1);
-        printP(td_f, td);
-        printP(menor, c(tinput), b, type, ig, comillas);
-        printP(c(ttext), comillas, b);
-        printP(c(namet), ig, comillas);
-        printI(20 + (i * 5));
-        printP(comillas, b, tvalue, ig, comillas);
-        printP(readdescr(filedesctemp, i+4, 20));
+      printP(tr);
+      if (priremio==i)    // sondas
+        {
+        printP(td, t(sonda), b);
+        printI(i+1);
+        printP(td_f,td); 
+        printP(menor, c(tinput), b, type, ig);
+        printP(comillas, c(ttext), comillas, b);
+        printP(c(namet), ig);
+        printPiP(comillas, i*5, comillas);
+        printP(b, tvalue, ig, comillas,readdescr(filedesctemp, i, 20));
         printP(comillas,b,c(max_length));
-        printIP(19, size_i);
+        printIP(19,size_i);
         printI(19);
         printP(comillas, mayor, menor, barra, c(tinput), mayor);
-        printP(td_f, td, t(ttipo), b);
-        printcampoCB(21 + (i * 5), conf.tipoED[i-4], ONOFF, dhtt); // número de parámetro ????
-
-        printP(td_f, c(td_if));
-        printP(c(td_if), td);
-        checkBox(24 + (i * 5), getbit8(iftttpinEDtemp, i)); // checkbox Notificar
-        printP(barra);
-        checkBox(124 + (i * 5), getbit8(iftttpinEDtemp, i + 8)); // checkbox Notificar
-        printP(td_f, tr_f);
+        printP(td_f);
+        }
+      else
+        {
+        strcpy(auxchar, sdremiohtm); strcat(auxchar, interr); strcat(auxchar, c(trem));
+        strcat(auxchar, itoa(iddevicetemp, buff, 10)); strcat(auxchar,amper);
+        strcat(auxchar, letrap); strcat(auxchar, ig); strcat(auxchar,itoa(i,buff,10));
+        strcpy(auxdesc,t(sonda)); strcat(auxdesc,b); strcat(auxdesc,itoa(i+1,buff,10));
+        printOpc(false, false, auxdesc);
+        printP(td,readdescr(filedesctemp,i,20),td_f);
+        }
+      printP(tr_f);
       }
 
+    if (priremio==3)    // entrada analógica   
+      {
+      printP(tr, td, t(entanalog),td_f);
+      printP(td,menor, c(tinput), b, type, ig);
+      printP(comillas, c(ttext), comillas, b);
+      printP(c(namet), ig);
+      printPiP(comillas, 15, comillas);
+      printP(b, tvalue, ig, comillas);
+      printP(readdescr(filedesctemp, 3, 20));
+      printP(comillas,b,c(max_length));
+      printIP(19, size_i);    
+      printI(19);
+      printP(comillas, mayor, menor, barra, c(tinput), mayor);
+      printP(td_f, td);
+  
+      printP(t(units), menor);
+      printP(c(tinput), b, type, ig);
+      printP(comillas,c(ttext), comillas, b);
+      printP(c(namet));
+      printP(ig);
+      printPiP(comillas, 16, comillas);
+      printP(b, tvalue, ig, comillas, unitpinAtemp);
+      printP(comillas,b,c(max_length));
+      printIP(3, size_i); printI(3);
+      printP(comillas, mayor, menor, barra, c(tinput), mayor);
+      printP(td_f, td, c(factor));
+      printcampoF(17, factorAtemp[0], 5);
+      printP(td_f, td, c(offset));
+      printcampoF(18, offsetAtemp[0], 5);
+      printP(td, symsum);
+      checkBox(19, (getbit8(bsumatAtemp, 0)));
+      }
+    else
+      {
+      strcpy(auxchar, sdremiohtm);  strcat(auxchar, interr); strcat(auxchar, c(trem));
+      strcat(auxchar, itoa(iddevicetemp, buff, 10)); strcat(auxchar,amper);
+      strcat(auxchar, letrap); strcat(auxchar, ig);strcat(auxchar,itoa(3,buff,10));
+      strcpy(auxdesc,t(entanalog)); strcat(auxdesc,b);  strcat(auxdesc,itoa(3,buff,10));
+      printOpc(false, false, auxdesc);
+
+      printP(td,readdescr(filedesctemp, 3, 20),td_f);
+      printP(td);
+  
+      printP(t(units),dp,b);
+      printP(unitpinAtemp);
+      printP(td_f, td, c(factor),dp,b);
+      printF(factorAtemp[0],5);
+      printP(td_f, td, c(offset),dp,b);
+      printF(offsetAtemp[0], 5);
+      printP(td, symsum);
+      printP(getbit8(bsumatAtemp,0)==1?symyes:symnot);
+      }
+    printP(td_f, tr_f);
+
+    for (byte i=0;i<maxED;i++)
+      {
+      if (priremio==i+4)
+        { 
+        if (modo45temp==0)
+          {
+          printP(tr, td, t(entradasdig), b);
+          printI(i+1);
+          printP(td_f, td);
+          printP(menor, c(tinput), b, type, ig, comillas);
+          printP(c(ttext), comillas, b);
+          printP(c(namet), ig, comillas);
+          printI(20 + (i * 5));
+          printP(comillas, b, tvalue, ig, comillas);
+          printP(readdescr(filedesctemp, i+4, 20));
+          printP(comillas,b,c(max_length));
+          printIP(19, size_i);
+          printI(19);
+          printP(comillas, mayor, menor, barra, c(tinput), mayor);
+          printP(td_f, td, t(ttipo), b);
+          printcampoCB(21 + (i * 5), conf.tipoED[i-4], ONOFF, dhtt); // número de parámetro ????
+  
+          printP(td_f, c(td_if));
+          printP(c(td_if), td);
+          checkBox(24 + (i * 5), getbit8(iftttpinEDtemp,i)); // checkbox Notificar
+          printP(barra);
+          checkBox(124 + (i * 5), getbit8(iftttpinEDtemp, i+ 8)); // checkbox Notificar
+          printP(td_f, tr_f);
+          }
+        }
+      else
+        {
+        if (modo45temp == 0)
+          {
+          printP(tr);
+          strcpy(auxchar, sdremiohtm);  strcat(auxchar, interr); strcat(auxchar, c(trem));
+          strcat(auxchar, itoa(iddevicetemp, buff, 10)); strcat(auxchar,amper);
+          strcat(auxchar, letrap); strcat(auxchar, ig);  strcat(auxchar,itoa(i+4,buff,10));
+          strcpy(auxdesc,t(entradasdig)); strcat(auxdesc,b);strcat(auxdesc,itoa(i+1,buff,10));
+          printOpc(false, false, auxdesc);
+          printP(td, readdescr(filedesctemp, i+4, 20));
+          printP(td, t(ttipo),dp, b);
+          printI(conf.tipoED[i-4]);  // CAMBIAR A TEXTO
+          printP(td_f, c(td_if));
+          printP(c(td_if), td);
+          printP(getbit8(iftttpinEDtemp, i)==1?symyes:symnot);
+          printP(barra);
+          printP(getbit8(iftttpinEDtemp, i+8)==1?symyes:symnot);
+          printP(td_f, tr_f);
+          }
+        } 
+      }
     printP(tr, c(td_if));
     printP(c(td_if), td_f);
     printP(td, letraV, punto, b, t(inicial), td_f);
     printP(td, c(tdefact), td_f, td);
     printP(c(tdefdes), td_f);
     printP(td, c(ifttt), td_f, tr_f);
+
     for (byte i=0; i<maxSD; i++) // salidas digitales
       {
-      printP(tr, td, t(saldig));
-      printI(i+1);
-      printP(td_f, td);
-
-      printP(menor, c(tinput), b, type, ig, comillas);
-      printP(c(ttext), comillas, b);
-      printP(c(namet), ig, comillas);
-      printI(30+(i*5));
-      printP(comillas, b, tvalue, ig, comillas);
-      printP(readdescr(filedesctemp, i + 6, 20));
-      printP(comillas,b,c(max_length));
-      printIP(19, size_i);
-      printI(19);
-      printP(comillas, mayor, menor, barra, c(tinput), mayor);
-      printP(td_f, td);
-      printcampoCB(31+(i*5), valinictemp[i], OFF, ON, t(ultimovalor));
-      printP(td_f, td);
-      printcampoL(32+(i*5), tempdefacttemp[i], 8, true);
-      printP(td_f, td);
-      printcampoL(33+(i*5), tempdefdestemp[i], 8, true);
-      printP(td_f, td);
-      checkBox(34+(i*5), getbit8(iftttpinSDtemp, i)); // checkbox Notificar
-      printP(barra);
-      checkBox(134+(i*5), getbit8(iftttpinSDtemp, i + 8)); // checkbox Notificar
-      printP(td_f, tr_f);
+      if (priremio==i+6) 
+        {
+        printP(tr, td, t(saldig));
+        printI(i+1);
+        printP(td_f, td);
+  
+        printP(menor, c(tinput), b, type, ig, comillas);
+        printP(c(ttext), comillas, b);
+        printP(c(namet), ig, comillas);
+        printI(30+i*5);
+        printP(comillas, b, tvalue, ig, comillas);
+        printP(readdescr(filedesctemp, i + 6, 20));
+        printP(comillas,b,c(max_length));
+        printIP(19, size_i);
+        printI(19);
+        printP(comillas, mayor, menor, barra, c(tinput), mayor);
+        printP(td_f, td);
+        printcampoCB(31+i*5, valinictemp[i], OFF, ON, t(ultimovalor));
+        printP(td_f, td);
+        printcampoL(32+i*5, tempdefacttemp[i], 8, true);
+        printP(td_f, td);
+        printcampoL(33+i*5, tempdefdestemp[i], 8, true);
+        printP(td_f, td);
+        checkBox(34+i*5, getbit8(iftttpinSDtemp, i)); // checkbox Notificar
+        printP(barra);
+        checkBox(134+i*5, getbit8(iftttpinSDtemp, i + 8)); // checkbox Notificar
+        printP(td_f, tr_f);
+        }
+      else
+        {
+        printP(tr);
+        strcpy(auxchar, sdremiohtm);  strcat(auxchar, interr); strcat(auxchar, c(trem));
+        strcat(auxchar, itoa(iddevicetemp, buff, 10)); strcat(auxchar,amper);
+        strcat(auxchar, letrap); strcat(auxchar, ig); strcat(auxchar,itoa(i+6,buff,10));
+        strcpy(auxdesc,t(saldig));strcat(auxdesc,b); strcat(auxdesc,itoa(i+1,buff,10));
+        printOpc(false, false, auxdesc);
+        
+        printP(td,readdescr(filedesctemp,i+6, 20),td_f, td);
+        printI(valinictemp[i]);
+        printP(td_f, td);
+        printL(tempdefacttemp[i]);
+        printP(td_f, td);
+        printL(tempdefdestemp[i]);
+        printP(td_f, td);
+        printP(getbit8(iftttpinSDtemp, i)==1?symyes:symnot);
+        printP(barra);
+        printP(getbit8(iftttpinSDtemp, i+8)==1?symyes:symnot);
+        printP(td_f, tr_f);
+        }
       }
     writeFooter(tguardar, false);
     }
@@ -3748,6 +3894,10 @@ void initConf()
   memset(mbtemp, 0, sizeof(mbtemp));         // estado relés remotos modbus (1 bit cada uno);
   memset(mbcons, 0, sizeof(mbcons));         // estado relés remotos modbus (1 bit cada uno);
   memset(mbstatus, 0, sizeof(mbstatus));     // estado relés remotos modbus (1 bit cada uno);
+  /////// mqtt
+  strcpy(conf.mqttpath[0],c(conuco));
+  strcpy(conf.mqttpath[1],conf.instname);
+  strcpy(conf.mqttpath[2],itoa(conf.iddevice,buff,10));
   
 }
 
@@ -4165,10 +4315,7 @@ void ICACHE_FLASH_ATTR setup(void) {
   Serial.print(c(spiffs));Serial.print(b);
   if (SPIFFS.begin()) Serial.println(ok); else { Serial.println(c(terror)); ; return; }
   Dir dir=SPIFFS.openDir(barra);
-  while (dir.next())   {
-    Serial.print(dir.fileName());  Serial.print(b);
-    File f=dir.openFile(letrar);
-    Serial.println(f.size());  }
+  while (dir.next())  { Serial.print(dir.fileName()); Serial.print(b); File f=dir.openFile(letrar); Serial.println(f.size());  }
   ///////  SPIFFS FIN
   ftpSrv.begin(admin,admin);    //username, password for ftp.  set ports in ESP8266FtpServer.h  (default 21, 50009 for PASV)
 
@@ -4176,11 +4323,8 @@ void ICACHE_FLASH_ATTR setup(void) {
   sensors1.setResolution(conf.prectemp);
   nTemp1 = sensors1.getDeviceCount();
 
-  readconf();
+  if (readconf()<sizeof(conf)) saveconf();
   if (conf.netseg==255) conf.netseg=1;      // provisional
-  strcpy(conf.mqttpath[0],c(conuco));
-  strcpy(conf.mqttpath[1],conf.instname);
-  strcpy(conf.mqttpath[2],itoa(conf.iddevice,buff,10));
 
   memset(mbtemp,0,sizeof(mbtemp));         // estado relés remotos modbus (1 bit cada uno);
   memset(mbcons,0,sizeof(mbcons));         // estado relés remotos modbus (1 bit cada uno);
@@ -4223,24 +4367,18 @@ void ICACHE_FLASH_ATTR setup(void) {
     WiFi.channel(conf.canalAP);
     WiFi.softAP(conf.ssidAP, conf.passAP, conf.canalAP, false);
     dPrint(t(canal)); dPrint(dp); dPrintI(WiFi.channel()); dPrint(crlf);
-    dPrint(c(IP)); Serial.print(WiFi.softAPIP()); dPrint(crlf);
+    dPrint(c(IP)); dPrint(dp); Serial.print(WiFi.softAPIP()); dPrint(crlf);
     }
   if ((conf.wifimode==0) || (conf.wifimode==2) || (conf.wifimode==12)) // STA o AP+STA
     {
-    dPrint(t(staticip));  dPrint(dp); dPrint(conf.staticIP ? t(SI) : t(NO)); dPrint(coma);
-    if (conf.staticIP==1)
-      {
-      dPrint(WiFi.config(conf.EEip, conf.EEgw, conf.EEmask, conf.EEdns, conf.EEdns2) == 1 ? ok : c(terror));
-      }
+    dPrint(t(staticip));  dPrint(dp); dPrint(conf.staticIP?t(SI):t(NO)); dPrint(coma);
+    if (conf.staticIP==1) { dPrint(WiFi.config(conf.EEip, conf.EEgw, conf.EEmask, conf.EEdns, conf.EEdns2)==1?ok:c(terror)); }
     dPrint(crlf);
     WiFi.begin(conf.ssidSTA, conf.passSTA, true);
     if (debugwifi) Serial.setDebugOutput(true);
     byte cont = 0;
     dPrint(t(conectando)); dPrint(b); dPrint(WiFi.SSID()); dPrint(barra); dPrint(WiFi.psk()); dPrint(b);
-    while ((!WiFi.isConnected()) && (cont++ < 20))  {
-      delay(1000);
-      dPrint(punto);
-    }
+    while ((!WiFi.isConnected()) && (cont++ < 20))  { delay(1000); dPrint(punto); }
     dPrint(crlf); dPrint(t(tconectado)); dPrint(b); dPrint(WiFi.isConnected()?ok:c(terror)); dPrint(crlf);
     dPrint(c(IP)); Serial.print(WiFi.localIP()); dPrint(crlf);
     dPrint(c(thost)); dPrint(WiFi.hostname()); dPrint(crlf);
@@ -4259,15 +4397,15 @@ void ICACHE_FLASH_ATTR setup(void) {
   server.begin();
   timeClient.begin();
   if (conf.modo45==0) {
-    Serial.print(c(tinput)); Serial.print(b); Serial.println(modet);
+    Serial.print(c(tinput)); Serial.print(dp); Serial.println(c(modet));
     pinMode(edPin[0], INPUT_PULLUP);
     pinMode(edPin[1], INPUT_PULLUP);    }
-  else if (conf.modo45 == 1) {
-    Serial.print(i2c); Serial.print(b); Serial.println(modet);
+  else if (conf.modo45==1) {
+    Serial.print(i2c); Serial.print(b); Serial.println(c(modet));
     Wire.begin(edPin[0], edPin[1]);
     if (!bmp085.begin()) { Serial.print(b);  Serial.println(BMP085notfound);    }  }
   else if (conf.modo45==2) {
-    Serial.print(modbust); Serial.print(b); Serial.println(modet);
+    Serial.print(modbust); Serial.print(b); Serial.println(c(modet));
     //    SoftSerial.begin(modbusbaud);
     //    SoftSerial.setTransmitEnablePin(rs485enpin);
     //    MBnode.begin(1, SoftSerial);
@@ -4367,18 +4505,23 @@ boolean mqttreconnect()
 
 void mqttpublishvalues()
 {
+//  Serial.print(" Mqtt publish:");
+  long tini=millis();
   for (byte i=0;i<8;i++)
-    {
-    strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
-    for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
-    strcat(auxdesc,idpin[i]);
-    if (i<=2) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
-    else if (i==3) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
-    else if (i<=5) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-2),buff,10));  }
-    else if (i<=7) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-6),buff,10));  }
-    PSclient.publish(auxdesc, auxchar);
-    strcpy(auxdesc,"");strcpy(auxchar,"");
-    }
+    if (getbit8(conf.mqttsalenable,i))
+      {
+      strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
+      for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
+      strcat(auxdesc,idpin[i]);
+      if (i<=2) { strcpy(auxchar,ftoa(MbR[i]));  }
+//      if (i<=2) { strcpy(auxchar,ftoa(MbR[i]/100));  }
+      else if (i==3) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
+      else if (i<=5) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-2),buff,10));  }
+      else if (i<=7) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-6),buff,10));  }
+      PSclient.publish(auxdesc, auxchar);
+      strcpy(auxdesc,"");strcpy(auxchar,"");
+      }
+//  Serial.print("-"); Serial.println(millis()-tini);
 }
 
 void ICACHE_FLASH_ATTR procesaSemanal()
@@ -4670,25 +4813,32 @@ void ICACHE_FLASH_ATTR loop(void)
   unsigned long tini = millis();
   //////////////////////////////////////////////////  
   if (conf.ftpenable) ftpSrv.handleFTP();        //make sure in loop you call handleFTP()!!  
-  server.handleClient();    // atiende peticiones http
+  if ((millis()-tini)>1000) { Serial.print(PSTR("handleFTP")); Serial.print(dp); Serial.println(millis()-tini); }
 
-  if (conf.mqttenable) 
-    {
-    if (!PSclient.connected())
-      {
-      long tnow = millis();
-      if (tnow-lastReconnectAttempt>5000) {
-        lastReconnectAttempt=tnow;
-        if (mqttreconnect()) lastReconnectAttempt=0;    // Attempt to reconnect
-        }
-      } 
-    else 
-      PSclient.loop();
-    }
+  tini=millis();
+  server.handleClient();    // atiende peticiones http
+  if ((millis() - tini) > 1000) { Serial.print(c(handleclientt)); Serial.print(dp); Serial.println(millis()-tini); }
+
+//  if (conf.mqttenable) 
+//    {
+//    tini=millis();
+//    if (!PSclient.connected())
+//      {
+//      long tnow=millis();
+//      if (tnow-lastReconnectAttempt>1000) {
+//        lastReconnectAttempt=tnow;
+//        if (mqttreconnect()) lastReconnectAttempt=0;    // Attempt to reconnect
+//        }
+//      } 
+//    else 
+//      PSclient.loop();
+//    if (millis()-tini>100) {Serial.print("mqttConnect "); Serial.println(millis()-tini);}
+////    if ((millis() - tini) > 1000) { Serial.print(PSTR("connectMQTT")); Serial.print(dp); Serial.println(millis()-tini); }
+//    }
+
   //  fauxmo.handle();
   ////////////////////////////////////////////////////  
 
-  if ((millis() - tini) > 5000) { Serial.print(c(handleclientt)); Serial.print(dp); Serial.println(millis()-tini); }
   leevaloresDIG();
   if ((millis() > (mact1 + 1000)))    // tareas que se hacen cada segundo
     {
@@ -4722,28 +4872,45 @@ void ICACHE_FLASH_ATTR loop(void)
         {
         if (getbit8(iftttchange,0)==1)
           {
-          if ((getbit8(conf.iftttpinSD, 0) == 1) && (getbit8(conf.MbC8, 0) == 1))
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal, 6, 20), textonoff(1));
-          if ((getbit8(conf.iftttpinSD, 8) == 1) && (getbit8(conf.MbC8, 0) == 0))
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal, 6, 20), textonoff(0));
+          if ((getbit8(conf.iftttpinSD,0)==1) && (getbit8(conf.MbC8,0)==1))
+            {
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,6,20), textonoff(1));
+            }
+          if ((getbit8(conf.iftttpinSD,8)==1) && (getbit8(conf.MbC8,0)==0))
+            {
+            readdescr(filedesclocal,6,20);
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(0));
+            }
           }
-        if (getbit8(iftttchange, 1) == 1)
+        if (getbit8(iftttchange,1)==1)
           {
-          if ((getbit8(conf.iftttpinSD, 1) == 1) && (getbit8(conf.MbC8, 1) == 1))
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal, 7, 20), textonoff(1));
-          if ((getbit8(conf.iftttpinSD, 9) == 1) && (getbit8(conf.MbC8, 1) == 0))
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal, 7, 20), textonoff(0));
+          if ((getbit8(conf.iftttpinSD,1)==1) && (getbit8(conf.MbC8,1)==1))
+            {
+            readdescr(filedesclocal,7,20);
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(1));
+            }
+          if ((getbit8(conf.iftttpinSD,9)==1) && (getbit8(conf.MbC8,1)==0))
+            {
+            readdescr(filedesclocal,7,20);
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(0));
+            }
           } 
-        if (getbit8(iftttchange, 1) == 1) if (getbit8(conf.iftttpinSD, 1) == 1) {
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal, 7, 20), textonoff(getbit8(conf.MbC8, 1)));
-          }
-        if (getbit8(iftttchange, 2) == 1) if (getbit8(conf.iftttpinED, 0) == 1) {
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal, 4, 20), textonoff(getbit8(conf.MbC8, 2)));
-          }
-        if (getbit8(iftttchange, 3) == 1) if (getbit8(conf.iftttpinED, 1) == 1) {
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal, 5, 20), textonoff(getbit8(conf.MbC8, 3)));
-          }
-        iftttchange[0] = 0;
+        if (getbit8(iftttchange,1)==1) if (getbit8(conf.iftttpinSD,1)==1) 
+            {
+            readdescr(filedesclocal,7,20);
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(getbit8(conf.MbC8, 1)));
+            }
+        if (getbit8(iftttchange, 2)==1) if (getbit8(conf.iftttpinED,0)==1) 
+            {
+            readdescr(filedesclocal,4,20);
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(getbit8(conf.MbC8, 2)));
+            }
+        if (getbit8(iftttchange,3)==1) if (getbit8(conf.iftttpinED,1)==1) 
+            {
+            readdescr(filedesclocal,5,20);
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice,auxdesc, textonoff(getbit8(conf.MbC8, 3)));
+            }
+        iftttchange[0]=0;
         }
       }
     else  // no conectado
@@ -4779,7 +4946,15 @@ void ICACHE_FLASH_ATTR loop(void)
     {
     tini = millis();
 //////////////////////////////////////////////
-    if (conf.mqttenable) {  mqttpublishvalues();    }
+    if (conf.mqttenable) 
+      {  
+      if (!PSclient.connected()) if (mqttreconnect())
+      if (PSclient.connected()) 
+        {
+          PSclient.loop();
+          mqttpublishvalues();    
+        }
+      }
 /////////////////////////////////////////////   
 //    if (!pendsave) lcdshowstatus();
     lastpro = 0; lastcode = 0; lastlen = 0; // pone a cero el último código 433
@@ -4799,7 +4974,7 @@ void ICACHE_FLASH_ATTR loop(void)
   }
 
   if ((millis() > (mact60 + 60000)))    // tareas que se hacen cada 60 segundos:1 minuto
-  {
+    {
     tini = millis();
     if (countfaulttime < conf.TempDesactPrg)      {
       procesaSemanal();
@@ -4808,37 +4983,29 @@ void ICACHE_FLASH_ATTR loop(void)
     else
       {
       timeClient.setTimeOffset(7200);
-      if (timeClient.update() == 1) {
-        countfaulttime = 0;
-        setTime(timeClient.getEpochTime());
-        }
+      if (timeClient.update()==1) { countfaulttime=0; setTime(timeClient.getEpochTime());  }
       }
     if ((millis() - tini) > 5000) { Serial.print(60); Serial.print(F(" SEG:")); Serial.println(millis() - tini); }
     mact60 = millis();
-  }
+    }
   if ((millis() > (mact3600 + 3600000)))    // tareas que se hacen cada 3600 segundos:1 hora
-  {
+    {
     tini = millis();
     if (WiFi.isConnected()) {
       timeClient.setTimeOffset(7200);
-      if (timeClient.update() == 1) {
-        countfaulttime = 0;
-        setTime(timeClient.getEpochTime());
-      }
+      if (timeClient.update()==1) { countfaulttime=0; setTime(timeClient.getEpochTime());  }
       getMyIP();
       checkMyIP();
       checkForUpdates();
-    }
-    if (millis() - tini > 1000) { Serial.print(3600); Serial.print(F(" seg.:")); Serial.println(millis() - tini); }
+      }
+    if (millis()-tini>1000) { Serial.print(3600); Serial.print(F(" seg.:")); Serial.println(millis()-tini); }
     mact3600 = millis();
   }
 
   if ((millis() > (mact86400 + 86400000)))    // tareas que se hacen cada 86400 segundos: 1 día
   {
     tini = millis();
-    if (WiFi.isConnected()) {
-      if (conf.iftttenable) ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, "MyIP", conf.myippub);
-    }
+//    if (WiFi.isConnected()) { if (conf.iftttenable) ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, "MyIP", conf.myippub); }
     //    if (millis()-tini>1000) {Serial.print(F("1 día.:")); Serial.println(millis()-tini);}
     mact86400 = millis();
   }

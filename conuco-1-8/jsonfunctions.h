@@ -139,11 +139,12 @@ void ICACHE_FLASH_ATTR buildjsonext()
 void ICACHE_FLASH_ATTR buildJsonConf(boolean remoto, boolean sendpass, boolean resetear)
 {
   printP(llave_i);
-  if (sendpass)
-    {
-    printP(comillas,letras,letras,comillas,dp,comillas); printP(remoto?ssidSTAtemp:conf.ssidSTA); printP(comillas,coma);
-    printP(comillas,letrap,letras,comillas,dp,comillas); printP(remoto?passSTAtemp:conf.passSTA); printP(comillas,coma);
-    }
+  printP(comillas,letras,letras,comillas,dp,comillas); 
+  printP(sendpass?remoto?ssidSTAtemp:conf.ssidSTA:vacio);
+  printP(comillas,coma);
+  printP(comillas,letrap,letras,comillas,dp,comillas); 
+  printP(sendpass?remoto?passSTAtemp:conf.passSTA:vacio); 
+  printP(comillas,coma);
   
   buildvalorI(letrar,letras,letrat,-1,resetear?1:0,vacio);
   buildvalorI(letraD,letraV,vacio,-1,remoto?iddevicetemp:conf.iddevice,vacio);
@@ -324,7 +325,6 @@ void ICACHE_FLASH_ATTR parseJsonConf()
   extrae(true,msg, PSTR("ps")).toCharArray(passSTAtemp,20);
   if (strlen(passSTAtemp)>0) strcpy(conf.passSTA,passSTAtemp);
   hacerresetrem=extrae(false,msg,PSTR("rst")).toInt();
-
   conf.iddevice=extrae(false,msg,DV).toInt();
   strcpy(conf.ssidAP, c(CONUCO)); strcat(conf.ssidAP,subray); strcat(conf.ssidAP, itoa(conf.iddevice,buff,10));
   conf.EEip[3]=conf.iddevice;

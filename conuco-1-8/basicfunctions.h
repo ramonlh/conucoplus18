@@ -70,24 +70,6 @@ char* ICACHE_FLASH_ATTR c(int pos)
   return auxdesc;
 }
 
-//char* ICACHE_FLASH_ATTR c(int pos)
-//{
-//  File auxfile=SPIFFS.open(filecommon,letrar);
-//  char auxC[42];
-//  if (auxfile)
-//    {
-//    auxfile.seek(42*(pos-1), SeekSet);
-//    auxfile.readBytes(auxC,42);
-//    auxfile.close();
-//Serial.print("auxC:");Serial.print(pos); Serial.print(" "); Serial.println(auxC);
-//    auxC[41]='\0';
-//    byte n=strlen(auxC);
-//    while ((n>0) && ((auxC[n-1]==' ')||(auxC[n-1]=='\n')||(auxC[n-1]=='\r'))) n--;
-//    auxC[n]='\0';
-//    }
-//  return auxC;
-//}
-
 void ICACHE_FLASH_ATTR savedescr(char* namefile, char* descr, byte ind, byte len)
 {
   File auxfile=SPIFFS.open(namefile, rmas);
