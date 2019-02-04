@@ -88,8 +88,8 @@ UP
 DOWN                                    
 LEFT                                    
 RIGTH                                   
-UP                                      
-DW                                      
+PgUp                                    
+PgDn                                    
 LF                                      
 RT                                      
 RF                                      
