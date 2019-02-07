@@ -24,7 +24,8 @@ void ICACHE_FLASH_ATTR printF(float value, byte deci) {
   printI(int(value)); if (deci>0) printP(punto);  
   for (byte i=0;i<deci;i++) if (int(pdec*pow(10,i+1))%10==0) printP(cero); else printI(abs(int(pdec*pow(10,i+1))%10));
   }
-  
+
+
 void ICACHE_FLASH_ATTR printIP(long valor, const  char *texto) { printI(valor); printP(texto); }
 
 void ICACHE_FLASH_ATTR printPiP(const char *texto1, int num, const char *texto2)
@@ -33,6 +34,23 @@ void ICACHE_FLASH_ATTR printPiP(const char *texto1, int num, const char *texto2)
 void ICACHE_FLASH_ATTR printColspan(int ancho)
   { printP(c(tdcolspan_i)); printI(ancho); printP(comillas, mayor);}
   
+void ICACHE_FLASH_ATTR cell(PGM_P texto)
+{
+  printP(td,texto,td_f); 
+}
+void ICACHE_FLASH_ATTR cell(int num)
+{
+  printPiP(td,num,td_f); 
+}
+
+void ICACHE_FLASH_ATTR ccell(int ntexto)
+{
+  printP(td,c(ntexto),td_f); 
+}
+void ICACHE_FLASH_ATTR tcell(int ntexto)
+{
+  printP(td,t(ntexto),td_f); 
+}
 void ICACHE_FLASH_ATTR espacioSep(int col)  //  espacio separación
   { printP(tr); printColspan(col);printP(td_f,tr_f);  }
 

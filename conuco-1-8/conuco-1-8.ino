@@ -100,7 +100,7 @@ void ICACHE_FLASH_ATTR leevaloresDHT()
 {
   for (byte i=0;i<2;i++)
     {
-    delay(dht[i].getMinimumSamplingPeriod());
+//    delay(dht[i].getMinimumSamplingPeriod());
     dhtdata[i][0]=dht[i].getTemperature();
     dhtdata[i][1]=dht[i].getHumidity();
     }
@@ -237,7 +237,7 @@ void ICACHE_FLASH_ATTR pinVAL(byte n, byte value, byte ori)
 int ICACHE_FLASH_ATTR pinvalR(byte ip, int port, byte pin, byte valor) // ejecuta comando remoto
 {
   
-  createhost(hostraiz,conf.netseg,ip);
+  createhost(ip);
   msg=vacio;
   printP(barra, valor?on:off, interr, letrap, ig, itoa(pin+12,buff,10));
   printP(amper, letrar, ig, itoa(conf.iddevice, buff, 10));
@@ -262,10 +262,14 @@ int ICACHE_FLASH_ATTR getMyIP()
 int ICACHE_FLASH_ATTR checkMyIP()
 {
   char auxip[16];
+  strcpy(auxip, conf.myippub);
+  Serial.print("auxip:"); Serial.print(auxip);
+  Serial.print("conf.myippub:"); Serial.println(conf.myippub);
+  getMyIP();    // busca actual y la guarda en conf.txt
   if (strcmp(conf.myippub, auxip) != 0) // son diferentes
     {
     saveconf();
-    if (conf.iftttenable) ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, "NewIP", conf.myippub);
+//    if (conf.iftttenable) ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, "NewIP", conf.myippub);
     }
 }
 
@@ -768,35 +772,37 @@ void ICACHE_FLASH_ATTR panelHTML() {
       }
 
   // ENTRADAS DIGITALES
-  if (conf.modo45 == 0)
+  if (conf.modo45==0)
+    {
     for (byte i=0; i<maxED; i++)
       if (getbit8(conf.bshowbypanel[auxI], i + 4))
         {
         if (conf.tipoED[i]==0)  // entrada digital ON/OFF
           {
-          printP(menor, PSTR("tr"), b);
+          printP(menor, letrat, letrar, b);
           printP(c(tid), ig, comilla, letral); 
           printI(i+2);
           printP(comilla, mayor);
           HtmlGetStateIn(i);
           printP(tr_f);
           }
-        else if (conf.tipoED[i]==1)
+        else if (conf.tipoED[i]==1)   // DHT
           {
           printP(tr);
-          printP(td, readdescr(filedesclocal, i + 4, 20), td_f, td);
+          printP(td,readdescr(filedesclocal, i+4, 20),td_f,td);
           printF(dhtdata[i][0],1);
-          printP(celsius, barraesp);
+          printP(celsius, b,barraesp);
           printF(dhtdata[i][1],0);
           printP(porcen);
           printP(td_f);
           printP(tr_f);
           }
         }
+    }
 
-  for (byte i = 0; i < maxsalrem; i++) // entradas digitales remotas
-    if (getbit8(conf.bshowbypanel[auxI], i + 8))
-      if ((conf.senalrem[i] >= 4) && (conf.senalrem[i] <= 5))
+  for (byte i=0; i<maxsalrem; i++) // entradas digitales remotas
+    if (getbit8(conf.bshowbypanel[auxI], i+8))
+      if ((conf.senalrem[i]>=4) && (conf.senalrem[i]<=5))
         {
         byte val = getbit8(bstatremote, i);
         printP(tr, (val == 0) ? td : th);
@@ -833,33 +839,33 @@ void ICACHE_FLASH_ATTR panelHTML() {
           printP(tr_f);
           }
 
-    for (byte i = 0; i < maxsalrem; i++) // Sensores remotos Modbus o I2C
+    for (byte i=0;i<maxsalrem; i++) // Sensores remotos Modbus o I2C
       {
-      if (getbit8(conf.bshowbypanel[auxI], i + 8))
+      if (getbit8(conf.bshowbypanel[auxI], i+8))
         {
-        if ((conf.idsalremote[i] > 0) && ((conf.idsalremote[i] <= 149) || (conf.idsalremote[i] >= 167))) // modbus o I2C
+        if ((conf.idsalremote[i]>0) && ((conf.idsalremote[i]<=149) || (conf.idsalremote[i]>=167))) // modbus o I2C
           {
-          if (posrem(conf.idsalremote[i]) > 0)
+          if (posrem(conf.idsalremote[i])>0)
             {
-            if (conf.tipoi2cmbrem[posrem(conf.idsalremote[i]) - 1] == 1)  // BMP085
+            if (conf.tipoi2cmbrem[posrem(conf.idsalremote[i])-1]==1)  // BMP085
               {
               printP(tr, td);
               if (conf.showN) { printparentesis(letrar, i+1); printparentesis(letraR, conf.idsalremote[i]);  }
               printP(b, readdescr(filesalrem, i, 20), td_f, td);
-              //              printF(bmp085.readTemperature(),1);
-              printP(b, celsius, barraesp);
-              //              printF(bmp085.readPressure()/100,0);
+              printF(bmp085.readTemperature(),1);
+              printP(b, celsius, b,barraesp);
+              printF(bmp085.readPressure()/100,0);
               printP(b, letram, letrab, td_f, tr_f);
               }
-            if (conf.tipoi2cmbrem[posrem(conf.idsalremote[i]) - 1] == 7)   // T-32-P
+            if (conf.tipoi2cmbrem[posrem(conf.idsalremote[i])-1]==7)   // T-32-P
               {
               printP(tr, getbit8(mbstatus, i) == 1 ? th : td);
               if (conf.showN) { printparentesis(letrar, i+1); printparentesis(letraR, conf.idsalremote[i]);   }
-              printP(b, readdescr(filesalrem, i, 20), getbit8(mbstatus, i) == 1 ? th_f : td_f, td);
+              printP(b, readdescr(filesalrem, i, 20), getbit8(mbstatus,i)==1?th_f:td_f,td);
               printF(mbtemp[i] * 0.01, 2);
               printP(barra);
-              printF(mbcons[i] * 0.01, 2);
-              printP(b, celsius, td_f, tr_f);
+              printF(mbcons[i]*0.01,2);
+              printP(b,celsius,td_f, tr_f);
               }
             }
           }
@@ -1047,12 +1053,12 @@ void ICACHE_FLASH_ATTR setupremHTML()
   for (byte i=0; i<maxdevrem; i++)
     {
     mpi=mp*i;
-    colorea = (posactrem == i);
+    colorea=(posactrem==i);
     printP(tr);
     if (posactrem==i)   {
-      printP(colorea ? th : td);
-      printcampoI(mpi + 1, conf.idremote[i], 3, true);
-      printP(colorea ? th_f : td_f);
+      printP(colorea?th:td);
+      printcampoI(mpi+1,conf.idremote[i], 3, true);
+      printP(colorea?th_f:td_f);
       }
     else
       {
@@ -1069,8 +1075,8 @@ void ICACHE_FLASH_ATTR setupremHTML()
           printP(href_i, comillas);
           printP(c(thttp));
           printP(hostraiz);
-//          printIP(conf.netseg,punto);
-          printIP(conf.idremote[i], dp);
+          printIP(conf.netseg,punto);
+          printIP(conf.idremote[i],dp);
           printI(88);
           printP(comillas, b, c(newpage), mayor);
           printP(c(conuco), href_f);
@@ -1083,7 +1089,7 @@ void ICACHE_FLASH_ATTR setupremHTML()
         printPiP(c(trem), conf.idremote[i], comillas);
         printP(b, c(newpage), mayor, io, href_f, td_f);
         }
-      else if (conf.idremote[i] <= 31)          // modbus
+      else if (conf.idremote[i]<=31)          // modbus
         {
         printP(td, modbust, td_f);
         printColspan(2);
@@ -1332,11 +1338,11 @@ void ICACHE_FLASH_ATTR setupioHTML()
       else if ((indice>=4) && (indice <= 5)) // entradas digitales
         {
         if (resto==0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
-        else if (resto==1) conf.tipoED[indice - 4] = server.arg(i).toInt();
-        else if (resto==4) setbit8(conf.iftttpinED, indice - 4, server.arg(i).toInt()); // Notificar si/no
-        else if (resto==5) setbit8(conf.iftttpinED, indice - 4 + 8, server.arg(i).toInt()); // Notificar si/no
+        else if (resto==1) conf.tipoED[indice-4] = server.arg(i).toInt();
+        else if (resto==4) setbit8(conf.iftttpinED, indice-4, server.arg(i).toInt()); // Notificar si/no
+        else if (resto==5) setbit8(conf.iftttpinED, indice+4, server.arg(i).toInt()); // Notificar si/no
         }
-      else if ((indice>=6) && (indice <= 7)) // salidas digitales
+      else if ((indice>=6) && (indice<=7)) // salidas digitales
         {
         if (resto==0) { server.arg(i).toCharArray(auxdesc, 20); savedescr(filedesclocal, auxdesc, indice, 20); }
         else if (resto==1) conf.valinic[indice-6] = server.arg(i).toInt();            // valor inicial
@@ -1357,11 +1363,11 @@ void ICACHE_FLASH_ATTR setupioHTML()
 
   printP(tr,td,t(descripcion),td_f);
   printColspan(2);
-  printP(PSTR("MQTT"),td_f);
+  printP(c(mqtt),td_f);
   printP(td,t(consigna),td_f);
   printP(td,t(salida),td_f);
-  printColspan(2); printP(PSTR("ON/OFF"),td_f);
-  printP(tr_f);
+  printColspan(2); 
+  printP(ONOFF,td_f,tr_f);
   for (byte i=0; i<8; i++)
     {
     printP(tr);
@@ -1386,7 +1392,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)));
         printP(td_f);
         printP(td);
-        printcampoI(mpi+7,conf.tempmqtt[i],5,true);
+        printcampoI(mpi+7,conf.tempmqtt[i],5,false);
         printP(td_f);
 
         printP(td);
@@ -1457,17 +1463,19 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printP(td_f);
         printColspan(2);
         printP(conf.accsetpoint[i]==0?guion:conf.accsetpoint[i]==1?OFF:ON,td_f);
-
-        
-//        printColspan(4);
-//        for (byte j=0; j<8; j++) {printH(addr1Wire[i][j]);printP(b);}
         }
       printP(td_f, tr_f);
       }
     if (i==3) // entrada analógica
       {
-      espacioSep(7);
-      if  (posactio==i)
+      printP(tr);
+      printColspan(3);
+      tcell(units);
+      ccell(factor);
+      ccell(offset);
+      cell(symsum);
+      printP(tr_f);
+      if  (posactio==3)
         {
         printP(td, menor, c(tinput), b, type, ig);
         printP(comillas, c(ttext), comillas, b);
@@ -1488,8 +1496,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printcampoI(mpi+7,conf.tempmqtt[i],5,true);
         printP(td_f);
 
-        printP(td, c(unit), b);
-        printP(menor, c(tinput), b, type, ig);
+        printP(td,menor, c(tinput), b, type, ig);
         printP(comillas, c(ttext), comillas, b);
         printP(c(namet), ig);
         printPiP(comillas, mpi + 1, comillas);
@@ -1500,27 +1507,24 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printP(comillas, mayor, menor, barra, c(tinput), mayor);
         printP(td_f, td, c(factor), b);
   
-        printcampoF(mpi+2, conf.factorA[i - 3], 5);
-        printP(td_f, td, c(offset), b);
-        printcampoF(mpi + 3, conf.offsetA[i - 3], 5);
-        colorea = getbit8(conf.bsumatA, i - 3);
-        printP(td_f, td, symsum, b);
-        checkBox(mpi+4, (getbit8(conf.bsumatA, i - 3)));
+        printcampoF(mpi+2, conf.factorA[0],5);
+        printP(td_f,td);
+        printcampoF(mpi+3, conf.offsetA[0],5);
+        colorea=getbit8(conf.bsumatA,0);
+        printP(td_f, td);
+        checkBox(mpi+4,(getbit8(conf.bsumatA,0)));
         }
       else
         {
         readdescr(filedesclocal,i,20);
         strcpy(auxchar, siohtm); strcat(auxchar, igualp); strcat(auxchar, itoa(i, buff, 10));
         printOpc(false, false, auxdesc);
-  
-        printP(td);
-        printP(getbit8(conf.mqttsalenable,i)?symyes:symnot);
-        printP(td_f);
-        printP(td);
-        printI(conf.tempmqtt[i]);
-        printP(td_f);
+
+        cell(getbit8(conf.mqttsalenable,i)?symyes:symnot);
+        cell(conf.tempmqtt[i]);
         
-        printP(td, conf.unitpinA, td_f, td);
+        cell(conf.unitpinA);
+        printP(td);
         printF(conf.factorA[i-3], 5);
         printP(td_f, td);
         printF(conf.offsetA[i-3], 5);
@@ -1528,8 +1532,17 @@ void ICACHE_FLASH_ATTR setupioHTML()
         }
       printP(td_f, tr_f);
       }
-    if (conf.modo45 == 0)
+    if (conf.modo45==0)
       {
+      if (i==4)
+        {
+        printP(tr);
+        printColspan(3);
+        tcell(ttipo);
+        printColspan(2); printP(td_f);
+        ccell(ifttt);
+        printP(tr_f);
+        }
       if ((i>=4) && (i<=5))    // entradas digitales
         {
         if (posactio==i) 
@@ -1554,11 +1567,11 @@ void ICACHE_FLASH_ATTR setupioHTML()
           printcampoI(mpi+7,conf.tempmqtt[i],5,true);
           printP(td_f);
         
-          printP(td, t(ttipo), b);
-          printcampoCB(mpi + 1, conf.tipoED[i - 4], ONOFF, dhtt);
+          printP(td);
+          printcampoCB(mpi+1, conf.tipoED[i-4], ONOFF, dhtt);
           printP(td_f);
           printColspan(2);
-          printP(td, c(ifttt), b, ON, barra, OFF);
+          printP(td);
           checkBox(mpi+4, getbit8(conf.iftttpinED, i-4)); // checkbox Notificar ON
           printP(barra);
           checkBox(mpi+5, getbit8(conf.iftttpinED, i+4)); // checkbox Notificar OFF
@@ -1586,6 +1599,16 @@ void ICACHE_FLASH_ATTR setupioHTML()
       }
    if ((i>=6) && (i<=7))    // salidas digitales
       {
+      if (i==6)
+        {
+        printP(tr);
+        printColspan(3);
+        printP(td,c(defaultt), td_f);
+        printP(td,c(tdefact),td_f);
+        printP(td,c(tdefdes),td_f);
+        printP(td,c(ifttt),td_f);
+        printP(tr_f);
+        }
       if (posactio==i) 
         {
         printP(td, menor, c(tinput), b, type, ig);
@@ -1607,14 +1630,13 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printcampoI(mpi+7,conf.tempmqtt[i],5,true);
         printP(td_f);
         
-        printP(td, c(defaultt), b);
+        printP(td);
         printcampoCB(mpi + 1, conf.valinic[i - 6], OFF, ON, t(ultimovalor));
-        printP(td_f, td, c(tdefact), b);
+        printP(td_f, td);
         printcampoL(mpi+2, conf.tempdefact[i - 6], 8, true);
-        printP(td_f, td, c(tdefdes), b);
+        printP(td_f, td);
         printcampoL(mpi+2, conf.tempdefdes[i - 6], 8, true);
-        printP(td_f, td, c(ifttt));
-        printP(b, ON, barra, OFF);
+        printP(td_f, td);
         checkBox(mpi + 4, getbit8(conf.iftttpinSD, i - 6)); // checkbox Notificar ON
         printP(barra);
         checkBox(mpi + 5, getbit8(conf.iftttpinSD, i - 6 + 8)); // checkbox Notificar OFF
@@ -2295,7 +2317,6 @@ void ICACHE_FLASH_ATTR setupdev150HTML()
     dPrint(c(IP)); Serial.print(WiFi.localIP()); dPrint(crlf);
     ////////////////////////////////
     //    sendOther(sdrem150htm,-1);
-    delay(10000);
     sendOther(slkhtm,-1);
     return;
     }
@@ -4324,7 +4345,7 @@ void ICACHE_FLASH_ATTR setup(void) {
   nTemp1 = sensors1.getDeviceCount();
 
   if (readconf()<sizeof(conf)) saveconf();
-  if (conf.netseg==255) conf.netseg=1;      // provisional
+  if ((conf.netseg==0) || (conf.netseg==255)) conf.netseg=1;      // provisional
 
   memset(mbtemp,0,sizeof(mbtemp));         // estado relés remotos modbus (1 bit cada uno);
   memset(mbcons,0,sizeof(mbcons));         // estado relés remotos modbus (1 bit cada uno);
@@ -4380,7 +4401,8 @@ void ICACHE_FLASH_ATTR setup(void) {
     dPrint(t(conectando)); dPrint(b); dPrint(WiFi.SSID()); dPrint(barra); dPrint(WiFi.psk()); dPrint(b);
     while ((!WiFi.isConnected()) && (cont++ < 20))  { delay(1000); dPrint(punto); }
     dPrint(crlf); dPrint(t(tconectado)); dPrint(b); dPrint(WiFi.isConnected()?ok:c(terror)); dPrint(crlf);
-    dPrint(c(IP)); Serial.print(WiFi.localIP()); dPrint(crlf);
+    dPrint(c(IP)); dPrint(dp); Serial.print(WiFi.localIP()); dPrint(crlf);
+    dPrint(c(tport)); dPrint(dp); Serial.print(88); dPrint(crlf);
     dPrint(c(thost)); dPrint(WiFi.hostname()); dPrint(crlf);
     }
   for (byte i=0; i<maxSD; i++)
@@ -4396,25 +4418,25 @@ void ICACHE_FLASH_ATTR setup(void) {
   initHTML();
   server.begin();
   timeClient.begin();
-  if (conf.modo45==0) {
+  if (conf.modo45==0) {         //Entradas digitales ON/OFF
     Serial.print(c(tinput)); Serial.print(dp); Serial.println(c(modet));
     pinMode(edPin[0], INPUT_PULLUP);
     pinMode(edPin[1], INPUT_PULLUP);    }
-  else if (conf.modo45==1) {
+  else if (conf.modo45==1) {    // I2C
     Serial.print(i2c); Serial.print(b); Serial.println(c(modet));
     Wire.begin(edPin[0], edPin[1]);
     if (!bmp085.begin()) { Serial.print(b);  Serial.println(BMP085notfound);    }  }
-  else if (conf.modo45==2) {
+  else if (conf.modo45==2) {    // modbus
     Serial.print(modbust); Serial.print(b); Serial.println(c(modet));
     //    SoftSerial.begin(modbusbaud);
     //    SoftSerial.setTransmitEnablePin(rs485enpin);
     //    MBnode.begin(1, SoftSerial);
     pinMode (edPin[0], INPUT_PULLUP);
     pinMode (edPin[1], OUTPUT);  }
+  for (byte i=0;i<2;i++) if (conf.tipoED[i]==1) dht[i].setup(edPin[i]);
 
   memset(timerem, 0, sizeof(timerem));
   for (byte i=0; i<maxdevrem; i++) { actirem[i]=true; actisenal[i]=true; }
-  dPrint(c(tport)); dPrint(dp); Serial.print(88); dPrint(crlf);
   dPrint(conf.userDev); dPrint(barra); dPrint(conf.passDev); dPrint(crlf);
   leevaloresOW();
   if (WiFi.isConnected()) {
@@ -4422,9 +4444,9 @@ void ICACHE_FLASH_ATTR setup(void) {
     if (timeClient.update() == 1) {
       countfaulttime = 0;
       setTime(timeClient.getEpochTime());    }
-    getMyIP();
-//    checkMyIP();
-//    dPrint(t(ippublica)); dPrint(dp); dPrint(conf.myippub); dPrint(crlf);
+//    getMyIP();
+    checkMyIP();
+    dPrint(t(ippublica)); dPrint(dp); dPrint(conf.myippub); dPrint(crlf);
     delay(100);
     if (mododirecto==1) { actualizamasters(); }
     actualizaremotos(mododirecto);
@@ -4468,8 +4490,6 @@ void ICACHE_FLASH_ATTR setup(void) {
   lcdshowstatus();
 
   ////////////////////// ZONA DE PRUEBAS ////////////
-  //  if (conf.tipoED[0]==1) dht0.setup(edPin[0]); // Connect DHT sensor to GPIO 4 (ED0)
-  //  if (conf.tipoED[1]==1) dht1.setup(edPin[1]); // Connect DHT sensor to GPIO 5 (ED1)
 
   //  fauxmo.enable(true);
   //
@@ -4870,80 +4890,47 @@ void ICACHE_FLASH_ATTR loop(void)
         }
       if (iftttchange[0]>0)
         {
-        if (getbit8(iftttchange,0)==1)
+        if (getbit8(iftttchange,0)==1)    // SD 0
           {
           if ((getbit8(conf.iftttpinSD,0)==1) && (getbit8(conf.MbC8,0)==1))
-            {
             ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,6,20), textonoff(1));
-            }
           if ((getbit8(conf.iftttpinSD,8)==1) && (getbit8(conf.MbC8,0)==0))
-            {
-            readdescr(filedesclocal,6,20);
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(0));
-            }
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,6,20), textonoff(0));
           }
-        if (getbit8(iftttchange,1)==1)
+
+        if (getbit8(iftttchange,1)==1)    // SD 1
           {
-          if ((getbit8(conf.iftttpinSD,1)==1) && (getbit8(conf.MbC8,1)==1))
-            {
-            readdescr(filedesclocal,7,20);
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(1));
-            }
-          if ((getbit8(conf.iftttpinSD,9)==1) && (getbit8(conf.MbC8,1)==0))
-            {
-            readdescr(filedesclocal,7,20);
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(0));
-            }
+          if ((getbit8(conf.iftttpinSD,1)==1) && (getbit8(conf.MbC8,1)==1))     // en ON
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,7,20), textonoff(1));
+          if ((getbit8(conf.iftttpinSD,9)==1) && (getbit8(conf.MbC8,1)==0))     // en OFF
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,7,20), textonoff(0));
           } 
-        if (getbit8(iftttchange,1)==1) if (getbit8(conf.iftttpinSD,1)==1) 
-            {
-            readdescr(filedesclocal,7,20);
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(getbit8(conf.MbC8, 1)));
-            }
-        if (getbit8(iftttchange, 2)==1) if (getbit8(conf.iftttpinED,0)==1) 
-            {
-            readdescr(filedesclocal,4,20);
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, auxdesc, textonoff(getbit8(conf.MbC8, 2)));
-            }
-        if (getbit8(iftttchange,3)==1) if (getbit8(conf.iftttpinED,1)==1) 
-            {
-            readdescr(filedesclocal,5,20);
-            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice,auxdesc, textonoff(getbit8(conf.MbC8, 3)));
-            }
+            
+        if (getbit8(iftttchange,2)==1)     // ED 0
+          {
+          if ((getbit8(conf.iftttpinED,0)==1) && (getbit8(conf.MbC8,2)==1))     // en ON 
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,4,20), textonoff(1));
+          if ((getbit8(conf.iftttpinED,8)==1) && (getbit8(conf.MbC8,2)==0))     // en OFF
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,4,20), textonoff(0));
+          }
+
+        if (getbit8(iftttchange,3)==1)      // ED 1
+          {
+          if ((getbit8(conf.iftttpinED,1)==1) && (getbit8(conf.MbC8,3)==1))     // en ON 
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice,readdescr(filedesclocal,5,20), textonoff(1));
+          if ((getbit8(conf.iftttpinED,9)==1) && (getbit8(conf.MbC8,3)==0))     // en OFF
+            ifttttrigger(conucochar, conf.iftttkey, conf.aliasdevice, readdescr(filedesclocal,5,20), textonoff(0));
+          }
         iftttchange[0]=0;
         }
       }
-    else  // no conectado
-      {
-      //      if ((wifimode==1) || (wifimode==2))    // AP o AP+STA
-      //        tictac(ledSt,4,50);
-      //      else if (wifimode==0)                 // modo STA
-      //        {
-      //        tictac(ledSt,2,50);         // alarma no conectado
-      //        wifimode=12;
-      //        WiFi.mode(WIFI_AP_STA);;    // poner en modo AP+STA
-      //        if (wifimode==12) ESP.reset();
-      //        }
-      }
-    //////////////////////
-    //    if (modo45==1)
-    //      {
-    //      Serial.print("Temperature = ");  Serial.print(bmp085.readTemperature());   Serial.println(" *C");
-    //      Serial.print("Pressure = ");     Serial.print(bmp085.readPressure());      Serial.println(" Pa");
-    //      // Calculate altitude assuming 'standard' barometric pressure of 1013.25 millibar = 101325 Pascal
-    //      Serial.print("Altitude = ");  Serial.print(bmp085.readAltitude());   Serial.println(" meters");
-    //      Serial.print("Pressure at sealevel (calculated) = ");  Serial.print(bmp085.readSealevelPressure());  Serial.println(" Pa");
-    //    // you can get a more precise measurement of altitude if you know the current sea level pressure which will
-    //    // vary with weather and such. If it is 1015 millibars that is equal to 101500 Pascals.
-    //      Serial.print("Real altitude = ");  Serial.print(bmp085.readAltitude(101500));   Serial.println(" meters");
-    //      }
-    ////////////////////////
     //    if ((millis()-tini)>5000) {Serial.print(F("1 SEG:"));  Serial.println(millis()-tini);}
     mact1 = millis();
     }
 
   if ((millis() > (mact10 + (conf.peractrem * 1000))))  // tareas que se hacen cada "peractrem" segundos
     {
+      checkMyIP();
     tini = millis();
 //////////////////////////////////////////////
     if (conf.mqttenable) 
@@ -4959,7 +4946,7 @@ void ICACHE_FLASH_ATTR loop(void)
 //    if (!pendsave) lcdshowstatus();
     lastpro = 0; lastcode = 0; lastlen = 0; // pone a cero el último código 433
     leevaloresOW();
-    if ((conf.tipoED[0] == 1) || (conf.tipoED[1] == 1)) leevaloresDHT();
+    if ((conf.tipoED[0]==1) || (conf.tipoED[1]==1)) leevaloresDHT();
     if (conf.modo45 == 2) leevaloresMB();
     if (WiFi.isConnected()) {
       unsigned long tini = millis();
@@ -4994,7 +4981,7 @@ void ICACHE_FLASH_ATTR loop(void)
     if (WiFi.isConnected()) {
       timeClient.setTimeOffset(7200);
       if (timeClient.update()==1) { countfaulttime=0; setTime(timeClient.getEpochTime());  }
-      getMyIP();
+//      getMyIP();
       checkMyIP();
       checkForUpdates();
       }

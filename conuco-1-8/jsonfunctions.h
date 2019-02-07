@@ -194,7 +194,7 @@ void ICACHE_FLASH_ATTR buildJsonConf(boolean remoto, boolean sendpass, boolean r
 
 int ICACHE_FLASH_ATTR ReqJson(int ip, int port) // pide json a remoto 
 {
-  createhost(hostraiz, 1, ip);
+  createhost(ip);
   msg=vacio;
   printP(barra,json,interr,ori,ig);
   printI(conf.iddevice);
@@ -203,7 +203,7 @@ int ICACHE_FLASH_ATTR ReqJson(int ip, int port) // pide json a remoto
 
 int ICACHE_FLASH_ATTR ReqJsonConf(int ip, int port) // pide jsonext a remoto
 {
-  createhost(hostraiz, 1, ip);
+  createhost(ip);
   msg=vacio;
   printP(barra,jsonconf);
   if (ip==1) printP(interr,letram,ig,uno);
@@ -212,7 +212,7 @@ int ICACHE_FLASH_ATTR ReqJsonConf(int ip, int port) // pide jsonext a remoto
 
 int ICACHE_FLASH_ATTR sendJsonConf(int ip, int port, boolean sendpass,boolean resetear) // envia json conf, recibe el comando "/rjc"->parsejconf->saveconf
 {
-  createhost(hostraiz, 1, ip);
+  createhost(ip);
   msg=vacio;
   buildJsonConf(true,sendpass,resetear);
   
@@ -231,7 +231,7 @@ int ICACHE_FLASH_ATTR sendJsonConf(int ip, int port, boolean sendpass,boolean re
 
 int ICACHE_FLASH_ATTR sendJson(int ip, int port) // envia json al master/ o a los masters
 {
-  createhost(hostraiz,1,ip);
+  createhost(ip);
   msg=vacio;
   printP(barra,rjson,interr,c(tdata),ig);
   buildJson();

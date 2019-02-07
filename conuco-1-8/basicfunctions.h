@@ -177,8 +177,11 @@ void ICACHE_FLASH_ATTR saveconf()
 
 void ICACHE_FLASH_ATTR printlinea(PGM_P texto) { for (byte i=0;i<20;i++) Serial.print(texto);Serial.println(); }
 
-void ICACHE_FLASH_ATTR createhost(char *hostraiz, byte seg, byte ip)
+void ICACHE_FLASH_ATTR createhost(byte ip)
 {
+  Serial.print("hostraiz:"); Serial.print(hostraiz);
+  Serial.print("  host:"); Serial.print(host);
+  Serial.print("  netseg:"); Serial.println(conf.netseg);
   strcpy(host,hostraiz); 
   strcat(host,itoa(conf.netseg, buff, 10)); 
   strcat(host,punto); 
