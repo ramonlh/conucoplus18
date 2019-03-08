@@ -116,7 +116,7 @@
 #define tdp 88
 #define ttimeoutrem 89    // no usada
 #define ttipo 90
-#define ultimovalor 91
+//#define ultimovalor 91
 #define units 92
 #define usuario 93
 #define tvalor 94
@@ -138,7 +138,7 @@
 #define useftp 110
 
 //////////////////////////////////////////////////////////////////////
-////// textos, deben coincidir con los textos del fichero common.txt
+////// textos, deben coincidir con los textos del fichero common.txtst
 #define dbm 2
 #define Time 3
 #define Chipid 4
@@ -206,8 +206,8 @@
 #define dweetfor 64
 #define dweetio 65
 #define inobin 66
-#define parasite 67 
-#define power 68
+#define tparasite 67 
+#define tpower 68
 #define minuto 69
 #define tport 70
 #define tfile 71
@@ -216,7 +216,7 @@
 #define chipsize 74
 #define chipspeed 75
 #define dns 76
-#define mask 77
+#define tmask 77
 #define modet 78
 #define gateway 79
 #define thttp 80
@@ -224,16 +224,16 @@
 #define alias 82
 //#define t12341234 83
 //#define i2c 84
-#define intro 85
-#define esc 86
+//#define intro 85
+//#define esc 86
 #define up 87
 #define down 88
 #define left 89
 #define rigth 90
-#define ups 91
-#define downs 92
-#define lefts 93
-#define rigths 94
+//#define ups 91
+//#define downs 92
+//#define lefts 93
+//#define rigths 94
 #define rf 95
 //#define modbust 96
 #define t32p 97
@@ -243,14 +243,14 @@
 #define api 101
 //#define diginput 102
 #define tadmin 103
-#define spiffs 104
+#define tspiffs 104
 #define pretty 105
 #define watermarkt 106 
 #define webcall 107
 #define notdefined 108
 #define hidden 109
 #define thost 110
-#define IP 111
+#define tIP 111
 #define runningt 112
 #define twifi 113
 #define ttimeoutNTP 114
@@ -323,7 +323,7 @@
 #define tdata 181
 //#define dataType 182 
 #define espsessionid 183 
-#define form 184
+#define tform 184
 #define form_f 185
 #define handleclientt 186
 //#define thead 187
@@ -343,7 +343,7 @@
 #define optionvalue 200 
 #define option_f 201
 #define pagenotfound 202 
-#define password 203
+#define tpassword 203
 #define pre_i 204
 #define pre_f 205
 //#define tPOST 206
@@ -370,7 +370,7 @@
 #define ifttt 227
 #define tinput 228
 #define Key 229
-#define ver 230
+#define tver 230
 #define vers 231
 #define web 232
 #define tid 233
@@ -385,18 +385,19 @@
 //#define apsta 242
 //#define sta 243
 #define factor 244
-#define offset 245
+#define toffset 245
 //#define checked 246
 //#define href_i 247
 //#define selected 248
 //#define iftttkeyt 249
 #define tssid 250
 #define tpass 251
-#define hr 252
+#define thr 252
 #define td_if 253
 //#define dhtt 254
 //#define ONOFF 255
 #define urltext 256
 #define Firmware 256
 #define MAC 258
+#define BMP085OK 259
 

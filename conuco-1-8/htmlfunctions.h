@@ -5,62 +5,62 @@ void ICACHE_FLASH_ATTR dPrint(char* texto) { if (debug) Serial.print(texto); }
 void ICACHE_FLASH_ATTR dPrint(PGM_P texto)  { if (debug) Serial.print(texto); }
 void ICACHE_FLASH_ATTR dPrintI(int valor)   { if (debug) Serial.print(valor); }
 
-void ICACHE_FLASH_ATTR printP(PGM_P texto1) { char c;  while ((c = pgm_read_byte(texto1++))) msg += c; }
-void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2) { printP(texto1); printP(texto2);}
-void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3) { printP(texto1, texto2); printP(texto3);}
-void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3, PGM_P texto4)
-  { printP(texto1,texto2);  printP(texto3,texto4); }
-void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3, PGM_P texto4, PGM_P texto5)
-  { printP(texto1, texto2, texto3, texto4);  printP(texto5); }
-void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3, PGM_P texto4, PGM_P texto5, PGM_P texto6)
-  { printP(texto1, texto2, texto3, texto4, texto5); printP(texto6); }
-
-void ICACHE_FLASH_ATTR printI(int value)  { printP(itoa(value, buff, 10));  }
-void ICACHE_FLASH_ATTR printH(int value)  { printP(itoa(value, buff, 16));  }
-void ICACHE_FLASH_ATTR printL(long value)  { printP(ltoa(value, buff, 10));  }
-
-void ICACHE_FLASH_ATTR printF(float value, byte deci) {
-  float pdec=value-int(value);
-  printI(int(value)); if (deci>0) printP(punto);  
-  for (byte i=0;i<deci;i++) if (int(pdec*pow(10,i+1))%10==0) printP(cero); else printI(abs(int(pdec*pow(10,i+1))%10));
-  }
-
-
-void ICACHE_FLASH_ATTR printIP(long valor, const  char *texto) { printI(valor); printP(texto); }
-
-void ICACHE_FLASH_ATTR printPiP(const char *texto1, int num, const char *texto2)
-  { printP(texto1); printI(num); printP(texto2);}
-
 void ICACHE_FLASH_ATTR printColspan(int ancho)
   { printP(c(tdcolspan_i)); printI(ancho); printP(comillas, mayor);}
   
-void ICACHE_FLASH_ATTR cell(PGM_P texto)
+void ICACHE_FLASH_ATTR cell(PGM_P texto) { printP(td,texto,td_f); }
+void ICACHE_FLASH_ATTR cell(int num) { printPiP(td,num,td_f); }
+void ICACHE_FLASH_ATTR cell(float num, byte deci) { printP(td); printF(num,deci); printP(td_f); }
+
+void ICACHE_FLASH_ATTR ccell(int ntexto) { printP(td,c(ntexto),td_f); }
+void ICACHE_FLASH_ATTR tcell(int ntexto) { printP(td,t(ntexto),td_f); }
+
+void ICACHE_FLASH_ATTR pt(int pos)
 {
-  printP(td,texto,td_f); 
-}
-void ICACHE_FLASH_ATTR cell(int num)
-{
-  printPiP(td,num,td_f); 
+  char auxlang[20]="";
+  if (conf.lang==0) strcpy(auxlang,filespanish);
+  if (conf.lang==1) strcpy(auxlang,fileenglish);
+  File auxfile=SPIFFS.open(auxlang,letrar);
+  if (auxfile)
+    {
+    auxfile.seek(42*(pos-1), SeekSet);
+    auxfile.readBytes(auxdesc,42);
+    auxfile.close();
+    auxdesc[41]='\0';
+    byte n=strlen(auxdesc);
+    while ((n>0) && ((auxdesc[n-1]==' ')||(auxdesc[n-1]=='\n')||(auxdesc[n-1]=='\r'))) n--;
+    auxdesc[n]='\0';
+    }
+  printP(auxdesc);
 }
 
-void ICACHE_FLASH_ATTR ccell(int ntexto)
+
+void ICACHE_FLASH_ATTR pc(int pos)
 {
-  printP(td,c(ntexto),td_f); 
+  File auxfile=SPIFFS.open(filecommon,letrar);
+  if (auxfile)
+    {
+    auxfile.seek(42*(pos-1), SeekSet);
+    auxfile.readBytes(auxdesc,42);
+    auxfile.close();
+    auxdesc[41]='\0';
+    byte n=strlen(auxdesc);
+    while ((n>0) && ((auxdesc[n-1]==' ')||(auxdesc[n-1]=='\n')||(auxdesc[n-1]=='\r'))) n--;
+    auxdesc[n]='\0';
+    }
+  printP(auxdesc);
 }
-void ICACHE_FLASH_ATTR tcell(int ntexto)
-{
-  printP(td,t(ntexto),td_f); 
-}
+
 void ICACHE_FLASH_ATTR espacioSep(int col)  //  espacio separación
   { printP(tr); printColspan(col);printP(td_f,tr_f);  }
 
-//void printinicampo() { printP(menor, c(tinput), b, type, ig, comillas); }
 void printfincampo() { printP(mayor, menor, barra, c(tinput), mayor); }
 void printdisabled() { printP(c(ttext)); printP(comillas,b,c(disabled)); printP(ig,comillas, c(disabled)); }
 void printselected(boolean check) { printP(b, check?checked:selected); }
 
-void ICACHE_FLASH_ATTR printcampoI(int numpar, int valactual, byte tam, boolean enabled)
+void ICACHE_FLASH_ATTR printcampoI(int numpar, int valactual, byte tam, boolean enabled,boolean printtd)
 {
+  if (printtd) printP(td);
   printP(menor, c(tinput), b, type, ig, comillas);  
   if (!enabled) printdisabled();
   printP(c(ttext), comillas, b);
@@ -72,10 +72,12 @@ void ICACHE_FLASH_ATTR printcampoI(int numpar, int valactual, byte tam, boolean 
   printIP(tam, size_i);
   printIP(tam,comillas);
   printfincampo();
+  if (printtd) printP(td_f);
 }
 
-void ICACHE_FLASH_ATTR printcampoL(int numpar, long valactual, byte tam, boolean enabled)
+void ICACHE_FLASH_ATTR printcampoL(int numpar, long valactual, byte tam, boolean enabled,boolean printtd)
 {
+  if (printtd) printP(td);
   printP(menor, c(tinput), b, type, ig, comillas);
   if (!enabled) printdisabled();
   printP(c(ttext), comillas, b);
@@ -87,6 +89,7 @@ void ICACHE_FLASH_ATTR printcampoL(int numpar, long valactual, byte tam, boolean
   printIP(tam, size_i);
   printIP(tam, comillas);
   printfincampo();
+  if (printtd) printP(td_f);
 }
 
 void ICACHE_FLASH_ATTR printcampoF(int numpar, float valactual, int deci)
@@ -103,11 +106,12 @@ void ICACHE_FLASH_ATTR printcampoF(int numpar, float valactual, int deci)
   printfincampo();
 }
 
-void ICACHE_FLASH_ATTR printcampoC(int numpar, char *valactual, byte tam, boolean visible, boolean enabled, boolean pass)
+void ICACHE_FLASH_ATTR printcampoC(int numpar, char *valactual, byte tam, boolean visible, boolean enabled, boolean pass,boolean printtd)
 {
+  if (printtd) printP(td);
   printP(menor, c(tinput), b, type, ig, comillas);
   if (visible)  {
-    printP(pass?c(password):c(ttext));
+    printP(pass?c(tpassword):c(ttext));
     if ((!enabled) && (!pass)) { printP(comillas, b, c(disabled)); printP(ig, comillas, c(disabled)); }
     printP(comillas);   }
   else
@@ -121,13 +125,15 @@ void ICACHE_FLASH_ATTR printcampoC(int numpar, char *valactual, byte tam, boolea
   printIP(tam-1, size_i);
   printIP(tam-1, comillas);
   printfincampo();
+  if (printtd) printP(td_f);
 }
 
 void ICACHE_FLASH_ATTR printparCP(const char *titulo, int numpar, char valactual[], byte tam, boolean pass)
 {
-  printP(td, titulo, td_f, td);
-  printcampoC(numpar, valactual, tam, true, true, pass);
-  printP(td_f);
+  printP(tr);
+  cell(titulo);
+  printcampoC(numpar, valactual, tam, true, true, pass,true);
+  printP(tr_f);
 }
 
 void ICACHE_FLASH_ATTR printcampoSiNo(int numpar, int valactual)
@@ -151,8 +157,9 @@ void ICACHE_FLASH_ATTR printparentesis(PGM_P letra, int numero)
   printP(paren_f, b, b);
 }
 
-void ICACHE_FLASH_ATTR checkBox(int numpar, bool selected)
+void ICACHE_FLASH_ATTR checkBox(int numpar, bool selected, boolean printtd)
 {
+  if (printtd) printP(td);
   printP(menor, c(tinput), b, type, ig, comillas);
   printP(c(checkbox), comillas, b);
   printP(c(namet), ig,comillas);
@@ -161,6 +168,7 @@ void ICACHE_FLASH_ATTR checkBox(int numpar, bool selected)
   printP(uno,comillas);
   if (selected) printselected(true);
   printfincampo();
+  if (printtd) printP(td_f);
 }
 
 void ICACHE_FLASH_ATTR writeHeader(boolean refreshmode, boolean ajaxmode)
@@ -188,8 +196,9 @@ void printinicampoCB(int numpar)
   printP(mayor);
 }
 
-void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, int pri, int ult)
+void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, int pri, int ult, boolean printtd)
 {
+  if (printtd) printP(td);
   printinicampoCB(numpar);
   for (byte j=pri; j<=ult; j++)   {
     printP(c(optionvalue));
@@ -197,10 +206,12 @@ void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, int pri, int ult)
     if (valact==j) printselected(false);
     printPiP(mayor, j, c(option_f));   }
   printP(c(select_f));
+  if (printtd) printP(td_f);
 }
 
-void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, byte lon, PGM_P t[])
+void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, byte lon, PGM_P t[], boolean printtd)
 {
+  if (printtd) printP(td);
   printinicampoCB(numpar);
   for (byte j=0;j<lon;j++)   {
     printP(c(optionvalue));
@@ -209,36 +220,37 @@ void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, byte lon, PGM_P t[])
     printP(mayor,t[j]);
     printP(c(option_f));   }
   printP(c(select_f));
+  if (printtd) printP(td_f);
 }
 
-void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1)
+void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, boolean printtd)
 {
   PGM_P t[]={t0,t1};
-  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t);
+  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t,printtd);
 }
 
-void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2)
+void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2, boolean printtd)
 {
   PGM_P t[]={t0,t1,t2};
-  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t);
+  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t,printtd);
 }
 
-void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2, PGM_P t3)
+void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2, PGM_P t3, boolean printtd)
 {
   PGM_P t[]={t0,t1,t2,t3};
-  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t);
+  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t,printtd);
 }
 
-void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2, PGM_P t3, PGM_P t4)
+void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2, PGM_P t3, PGM_P t4, boolean printtd)
 {
   PGM_P t[]={t0,t1,t2,t3,t4};
-  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t);
+  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t,printtd);
 }
 
-void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2, PGM_P t3, PGM_P t4, PGM_P t5)
+void ICACHE_FLASH_ATTR printcampoCB(int numpar, int valact, PGM_P t0, PGM_P t1, PGM_P t2, PGM_P t3, PGM_P t4, PGM_P t5, boolean printtd)
 {
   PGM_P t[]={t0,t1,t2,t3,t4,t5};
-  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t);
+  printcampoCB(numpar,valact,sizeof(t)/sizeof(t[0]),t,printtd);
 }
 
 void ICACHE_FLASH_ATTR tituloFila(PGM_P texto, int num, PGM_P letra, int indice)
@@ -249,12 +261,22 @@ void ICACHE_FLASH_ATTR tituloFila(PGM_P texto, int num, PGM_P letra, int indice)
   printPiP(b, num, td_f);
 }
 
-void ICACHE_FLASH_ATTR printFecha()
+
+void printTime()
 {
   printI(day()); printPiP(barra, month(), barra); printIP(year(),b);
   if (hour()<10) printP(cero); printI(hour()); printP(dp);
   if (minute()<10) printP(cero); printI(minute()); printP(dp);
   if (second()<10) printP(cero); printI(second());
+}
+
+void ICACHE_FLASH_ATTR HtmlGetStateTime()
+{
+  printColspan(2);
+  printTime();
+  printP(b, c(PRG), b, (countfaulttime < conf.TempDesactPrg) ? ON : OFF, b);
+  printI(ESP.getFreeHeap());
+  printP(td_f);
 }
 
 char* ICACHE_FLASH_ATTR textonoff(float valor)

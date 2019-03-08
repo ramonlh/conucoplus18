@@ -3,7 +3,7 @@
 typedef struct {byte pro[6]; unsigned long code[6]; int len[6];} rftype;   // 42 bytes
 typedef struct {byte proon[18]; unsigned long codeon[18]; int lenon[18]; byte prooff[18]; unsigned long codeoff[18]; int lenoff[18];} code433type;   // 252 bytes
 typedef struct {int devori; int actualizaut; float s[3];float a1; char ua1[4]; int di[2],ds[2]; 
-                long tdi[2],tdo[2]; char mac[13]; char idmyj[10];} conucodata;
+                long tdi[2],tdo[2]; char mac[13]; char idmyj[10]; float dhtdata[2][2]; } conucodata;
 typedef struct {    // datos configuración
                 rftype rfkeys;
                 code433type code433;
@@ -15,7 +15,7 @@ typedef struct {    // datos configuración
                 byte showN=0;                     // 1 byte, indica si se muestra el número de pin en la lista de señales
                 unsigned int peractpan=15;        // 2 período de actualización automática página paneles
                 byte prectemp=12;                 // precisión de la lectura de sondas DS18B20
-                byte tipoED[maxED]={0,0};         // 2x1, 2 bytes, tipo de la entrada digital: 0=ON/OFF, 1=DHT11,2=DHT21,3=DHT22,4=RS485 RX/TX, ...
+                byte tipoED[maxED]={0,0};         // 2x1, 2 bytes, tipo de la entrada digital: 0=ON/OFF, 1=OFF/ON, 2=DHT11,3=DHT21,4=DHT22,5=RS485 RX/TX, ...
                 byte bPRGeve[maxPrg][2];          // 16 bytes, para guardar 2x8 bits de asociación PRG-PRGeve
                 byte usepassDev=0;                // 1 byte, 0 no usar password,  1 usar password
                 char userDev[20]="admin";         // 20 bytes, usuario device
@@ -107,14 +107,14 @@ typedef struct {    // datos configuración
                 byte netseg=1;                    // 1 byte, segmento de red=EEip[2]
                 float setpoint[3]={0.0,0.0,0.0};  // setpoint temperaturas
                 byte salsetpoint[3]={0,0,0};      // salida asociada al setpoint (0,1 salidas locales; 2-17 salidas remotas)
-                byte accsetpoint[3]={2,2,2};      // acción asociada al setpoint (0=OFF,1=ON,2=ninguna)
+                byte accsetpoint[3]={2,2,2};      // acción asociada al setpoint (1=OFF,2=ON,0=ninguna)
                 byte MbC8[1]={0};                 // estado de ED y SD: 0:SD0, 1:SD1, 2:ED0, 3:ED1
                 byte ftpenable=1;                 // 0=disnable, 1=enable
                 byte lang=0;                      // 0=español, 1=inglés
                 byte mqttenable=0;                // desactiva MQTT
                 char mqttserver[40]="";           // MQTT broker
                 char mqttpath[6][10]={"","","","","",""};             // MQTT path
-                char instname[10]="";             // nombre de la instalación
+                char instname[10]="INSTAL";       // nombre de la instalación
                 unsigned int tempmqtt[8]={0,0,0,0,0,0,0,0};  // período de envío mqtt para cada señal
                } conftype;
 
@@ -149,7 +149,7 @@ String msg;                     // String donde se construye la respuesta HTML q
 char buff[20];                  // 20 bytes, auxiliar
 char auxchar[130];              // 130 bytes, auxiliar 
 char auxdesc[60];               // 60 bytes, auxiliar para lectura de descriptores de archivos
-byte addr[maxTemp][8];          // 3x8, 24 bytes identificador de cada sonda DS18B20 (64)
+//byte addr[maxTemp][8];          // 3x8, 24 bytes identificador de cada sonda DS18B20 (64)
 int peractpantemp=10;           // 2 período de actualización automática página panel
 int peractremtemp=10;           // 2 período de actualización automática a nodo raíz
 byte bsumatAtemp[maxEA]={0};    // 1 byte,  mostrar sumaA temp
@@ -181,12 +181,13 @@ int TempDesactPrgtemp=600;      // 2 bytes, tiempo desactivacion programacion en
 int mbtemp[16];                 // temperaturas remotos modbus
 int mbcons[16];                 // consignas remotos modbus
 byte mbstatus[2];               // estado relés remotos modbus (1 bit cada uno);
-byte bstatremote[2];            // 2 bytes, estado de cada salida remota
+byte bstatremote[4];            // 4 bytes, estado de cada posible salida remota
+byte tipoedremote[32];          // 32 bytes, tipo de cada posible entrada digital remota, 0=ON/OFF, 1=DHT
 float sondaremote[maxsalrem];   // 128 bytes, valores de sondas remotas
 
 char mac[14]="";                // MAC del dispositivo
 
-byte bevenENABLE[2][8];       // 2x8, 16 bytes, define si la condición ha activado ya algo
+byte bevenENABLE[2][8];         // 2x8, 16 bytes, define si la condición ha activado ya algo
 char host[16]="";
 char hostraiz[16]="192.168.";
 byte NumOri=0;
@@ -195,12 +196,10 @@ byte ListOri[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 float factorAtemp[maxEA]={1.0}; // 1x4 factor conversión analógicas locales temp
 float offsetAtemp[maxEA]={0.0}; // 1x4 offset conversión analógicas locales temp
 
-byte MbC8ant[1]={0};            // estado anterior de ED y SD: 0:SD0, 1:SD1, 2:ED0, 3:ED1
+byte MbC8ant[1]={0};            // estado anterior de SD y ED: 0:SD0, 1:SD1, 2:ED0, 3:ED1
 int MbR[4];                     // 0-2 Temperaturas locales, 3 analógica local
 int MbRant[4];                  // 0-2 Temperaturas locales, 3 analógica local, valores anteriore
 byte iftttchange[1]={0};
-byte mododirecto=1;
-int syncerror=0;
 char idmyjsontemp[10]="";
 boolean onescenaact=false;
 byte addr1Wire[maxTemp][8];
@@ -248,7 +247,7 @@ byte priremio=0;
 byte hacerresetrem=0;
 long lastReconnectAttempt=0;
 boolean pendsave = false;
-IoTtweet myiot;       //naming your devices
+boolean bmp085enabled=false;
 conucodata datosremoto;
 
 char admin[]="admin";

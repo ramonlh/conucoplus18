@@ -23,11 +23,9 @@ PGM_P(htmlHead_3)=
     "table.n td {border-style:solid;border-color:#666666;border-width:2px;padding:4px;background-color:#DEDEDE;}"
     "</style>";
 
-
 // textos html NO MODIFICAR
 
 PGM_P(hrefon)="\"on?p=";
-
 PGM_P(json)="j";
 PGM_P(jsonconf)="jc";
 PGM_P(jsonext)="je";
@@ -45,7 +43,6 @@ PGM_P(tpanel)="\"p\"";
 PGM_P(crlf)="\r\n";  
 PGM_P(ON)="ON"; 
 PGM_P(OFF)="OFF";
-PGM_P(celsius)="&#8451;";
 PGM_P(br)="<br />";
 PGM_P(size_i)="\" size=\"";  
 PGM_P(comilla)="'";
@@ -141,7 +138,6 @@ PGM_P(cuatro)="4";
 PGM_P(cinco)="5";
 PGM_P(seis)="6";
 PGM_P(siete)="7";
-//PGM_P(sumat)="Σ";
 PGM_P(b)=" ";
 PGM_P(coma)=",";
 PGM_P(barra)="/";
@@ -169,10 +165,11 @@ PGM_P(vacio)="";
 PGM_P(amas)="a+";
 PGM_P(rmas)="r+";
 PGM_P(wmas)="w+";
-PGM_P(symyes)="&#10004;";
-PGM_P(symnot)="&#10006;";
+PGM_P(celsius)="&#8451;";
 PGM_P(symsum)="&#8721;";
 PGM_P(symhoz)="&#9773;";
+PGM_P(symyes)="&#10004;";
+PGM_P(symnot)="&#10006;";
 
 //////  No convertibles
 PGM_P(applicationjson)="application/json; charset=utf-8";
@@ -205,30 +202,35 @@ PGM_P(sta)="STA";
 PGM_P(href_i)="<a href=";
 PGM_P(dhtt)="DHT";
 PGM_P(ONOFF)="ON/OFF";
+PGM_P(OFFON)="OFF/ON";
 PGM_P(selected)="selected";
 PGM_P(checked)="checked";
 PGM_P(tvalue)="value";
 PGM_P(tguardar)="Guardar";
 PGM_P(tejecutar)="Ejecutar";
 PGM_P(dataType)="dataType";
+PGM_P(ultimovalor)="Last value";
+PGM_P(intro)="INTRO";
+PGM_P(esc)="ESC";
+PGM_P(ups)="PgUp";
+PGM_P(downs)="PgDn";
+PGM_P(lefts)="LF";
+PGM_P(rigths)="RT";
+
 ///////////////////////////////
 
 // json codes
 PGM_P(aa)="aa";
 PGM_P(DV)="DV";
-PGM_P(s0)="s0";
-PGM_P(s1)="s1";
-PGM_P(s2)="s2";
-PGM_P(a0)="a0";
 PGM_P(ua0)="ua0";
-PGM_P(el0)="el0";
-PGM_P(el1)="el1";
-PGM_P(sl0)="sl0";
-PGM_P(sl1)="sl1";
-PGM_P(tel0)="tel0";
-PGM_P(tel1)="tel1";
-PGM_P(tsl0)="tsl0";
-PGM_P(tsl1)="tsl1";
+//PGM_P(el0)="e0";
+//PGM_P(el1)="e1";
+//PGM_P(sl0)="s0";
+//PGM_P(sl1)="s1";
+PGM_P(tel0)="te0";
+PGM_P(tel1)="te1";
+PGM_P(tsl0)="ts0";
+PGM_P(tsl1)="ts1";
 PGM_P(MJ)="MJ";
 PGM_P(al)="al";
 PGM_P(ro)="ro";

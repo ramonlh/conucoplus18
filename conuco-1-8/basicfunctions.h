@@ -83,31 +83,48 @@ void ICACHE_FLASH_ATTR savedescr(char* namefile, char* descr, byte ind, byte len
   auxfile.close();   
 }
 
+void ICACHE_FLASH_ATTR addlog(File fileact)
+{
+  if (day()<10) fileact.print(cero); fileact.print(day()); fileact.print(barra);
+  if (month()<10) fileact.print(cero); fileact.print(month()); fileact.print(barra);
+  if (year()<10) fileact.print(cero); fileact.print(year()); fileact.print(b);
+  if (hour()<10) fileact.print(cero); fileact.print(hour()); fileact.print(dp);
+  if (minute()<10) fileact.print(cero); fileact.print(minute()); fileact.print(dp);
+  if (second()<10) fileact.print(cero); fileact.print(second()); fileact.print(b);
+}
+
 void ICACHE_FLASH_ATTR addlog(byte tipo, int code, char *texto)
 {
-//  File auxfile=SPIFFS.open("/log.txt",amas);
-//  if (auxfile)  
-//    { 
-//    if (hour()<10) auxfile.print(cero); auxfile.print(hour()); auxfile.print(dp);
-//    if (minute()<10) auxfile.print(cero); auxfile.print(minute()); auxfile.print(dp);
-//    if (second()<10) auxfile.print(cero); auxfile.print(second()); auxfile.print(b);
-//    auxfile.print(code); auxfile.print(b);
-//    auxfile.print(texto);
-//    auxfile.println(crlf); 
-//    auxfile.close();   }
+  File auxfile=SPIFFS.open("/log.txt","a+");
+  if (auxfile)  
+    { 
+    if (day()<10) auxfile.print(cero); auxfile.print(day()); auxfile.print(barra);
+    if (month()<10) auxfile.print(cero); auxfile.print(month()); auxfile.print(barra);
+    if (year()<10) auxfile.print(cero); auxfile.print(year()); auxfile.print(b);
+    if (hour()<10) auxfile.print(cero); auxfile.print(hour()); auxfile.print(dp);
+    if (minute()<10) auxfile.print(cero); auxfile.print(minute()); auxfile.print(dp);
+    if (second()<10) auxfile.print(cero); auxfile.print(second()); auxfile.print(b);
+    auxfile.print(code); auxfile.print(b);
+    auxfile.print(texto);
+    auxfile.println(crlf); 
+    auxfile.close();   }
 }
 
 void ICACHE_FLASH_ATTR addlog(byte tipo, int code, PGM_P texto)
 {
 //  File auxfile=SPIFFS.open("/log.txt",amas);
-//  if (auxfile)  
-//    { 
-//    if (hour()<10) auxfile.print(cero); auxfile.print(hour()); auxfile.print(dp);
-//    if (minute()<10) auxfile.print(cero); auxfile.print(minute()); auxfile.print(dp);
-//    if (second()<10) auxfile.print(cero); auxfile.print(second()); auxfile.print(b);
-//    auxfile.print(code); auxfile.print(b);
-//    auxfile.println(texto); 
-//    auxfile.close();   }
+  File auxfile=SPIFFS.open("/log.txt","a+");
+  if (auxfile)  
+    { 
+    if (day()<10) auxfile.print(cero); auxfile.print(day()); auxfile.print(barra);
+    if (month()<10) auxfile.print(cero); auxfile.print(month()); auxfile.print(barra);
+    if (year()<10) auxfile.print(cero); auxfile.print(year()); auxfile.print(b);
+    if (hour()<10) auxfile.print(cero); auxfile.print(hour()); auxfile.print(dp);
+    if (minute()<10) auxfile.print(cero); auxfile.print(minute()); auxfile.print(dp);
+    if (second()<10) auxfile.print(cero); auxfile.print(second()); auxfile.print(b);
+    auxfile.print(code); auxfile.print(b);
+    auxfile.println(texto); 
+    auxfile.close();   }
 }
 
 byte ICACHE_FLASH_ATTR getbit8(byte tabla[], byte pin)
@@ -142,16 +159,6 @@ void ICACHE_FLASH_ATTR printhora() {
   printconceros(second());  
   }
 
-boolean ICACHE_FLASH_ATTR clientremote(){
-  return ((server.remoteIP[0]!=192) && (server.remoteIP[0]!=0)); }
-
-void ICACHE_FLASH_ATTR printremote() {
-  if (!clientremote()) return;
-  printhora();
-  for (byte i=0;i<3;i++) {Serial.print(server.remoteIP[i]);Serial.print(punto);}
-  Serial.println(server.remoteIP[3]);
-  }
-
 int ICACHE_FLASH_ATTR posrem(int numrem)  {
   int p=0;
   boolean encontrado=false;
@@ -179,9 +186,6 @@ void ICACHE_FLASH_ATTR printlinea(PGM_P texto) { for (byte i=0;i<20;i++) Serial.
 
 void ICACHE_FLASH_ATTR createhost(byte ip)
 {
-  Serial.print("hostraiz:"); Serial.print(hostraiz);
-  Serial.print("  host:"); Serial.print(host);
-  Serial.print("  netseg:"); Serial.println(conf.netseg);
   strcpy(host,hostraiz); 
   strcat(host,itoa(conf.netseg, buff, 10)); 
   strcat(host,punto); 
@@ -236,4 +240,175 @@ boolean checkfiles()
   filesok=auxB;
   return auxB;
 }
+
+void ICACHE_FLASH_ATTR printP(PGM_P texto1) { char c;  while ((c = pgm_read_byte(texto1++))) msg += c; }
+void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2) { printP(texto1); printP(texto2);}
+void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3) { printP(texto1, texto2); printP(texto3);}
+void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3, PGM_P texto4)
+  { printP(texto1,texto2);  printP(texto3,texto4); }
+void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3, PGM_P texto4, PGM_P texto5)
+  { printP(texto1, texto2, texto3, texto4);  printP(texto5); }
+void ICACHE_FLASH_ATTR printP(PGM_P texto1, PGM_P texto2, PGM_P texto3, PGM_P texto4, PGM_P texto5, PGM_P texto6)
+  { printP(texto1, texto2, texto3, texto4, texto5); printP(texto6); }
+
+void ICACHE_FLASH_ATTR printI(int value)  { printP(itoa(value, buff, 10));  }
+void ICACHE_FLASH_ATTR printH(int value)  { printP(itoa(value, buff, 16));  }
+void ICACHE_FLASH_ATTR printL(long value)  { printP(ltoa(value, buff, 10));  }
+
+void ICACHE_FLASH_ATTR printF(float value, byte deci) {
+  float pdec=value-int(value);
+  printI(int(value)); if (deci>0) printP(punto);  
+  for (byte i=0;i<deci;i++) if (int(pdec*pow(10,i+1))%10==0) printP(cero); else printI(abs(int(pdec*pow(10,i+1))%10));
+  }
+void ICACHE_FLASH_ATTR printIP(long valor, const  char *texto) { printI(valor); printP(texto); }
+
+void ICACHE_FLASH_ATTR printPiP(const char *texto1, int num, const char *texto2)
+  { printP(texto1); printI(num); printP(texto2);}
+
+
+
+
+bool ICACHE_FLASH_ATTR autOK()
+{
+  return true;      // provisional
+  if (conf.usepassDev == 0) return true;
+  if (server.hasHeader("Cookie"))
+    if (server.header("Cookie").indexOf("ESPSESSIONID=1") != -1)
+      return true;
+  return false;
+}
+
+void ICACHE_FLASH_ATTR printOpc(boolean colorea, boolean activa, char* texto)
+{
+  if (activa)
+    printP(th, texto, th_f);
+  else  {
+    printP(colorea?th:td, href_i, comillas, auxchar, comillas, mayor);
+    printP(texto, href_f, colorea?th_f:td_f);
+  }
+}
+
+void ICACHE_FLASH_ATTR printOpc(boolean colorea, boolean activa, PGM_P texto)
+{
+  if (activa)
+    printP(th, texto, th_f);
+  else  {
+    printP(colorea?th:td, href_i, comillas, auxchar, comillas, mayor);
+    printP(texto, href_f, colorea?th_f:td_f);
+  }
+}
+
+void ICACHE_FLASH_ATTR printOpc(boolean colorea, boolean activa, PGM_P texto, PGM_P link)
+{
+  if (activa)
+    printP(th, texto, th_f);
+  else  {
+    printP(colorea?th:td, href_i, comillas, link, comillas, mayor);
+    printP(texto, href_f, colorea ? th_f : td_f);
+  }
+}
+
+void ICACHE_FLASH_ATTR printOpc(boolean colorea, boolean activa, PGM_P texto, PGM_P link, byte i)
+{
+  if (activa)
+    printP(th, texto, th_f);
+  else  {
+    printP(colorea?th:td, href_i, comillas, link, interr, letran);
+    printP(ig);
+    printI(i);
+    printP(comillas, mayor, texto, href_f, colorea ? th_f : td_f);
+  }
+}
+
+void ICACHE_FLASH_ATTR writeMenu(byte opcprin, byte opcsec)
+{
+  printP(c(body_i), menor);
+  printP(table, b);
+  printP(c(tclass));
+  printP(ig, tmenu, mayor, tr); // formato menú
+  printOpc(false, (opcprin==1), t(zonas), panelhtm); // PANEL
+  printOpc(false, (opcprin==3), t(configuracion), sdhtm); // CONFIGURACIÓN
+  printOpc(false, (opcprin==2), t(programas), sprghtm); // Programas
+  printOpc(false, (opcprin==4), t(sistema), espsyshtm); // Sistema
+
+  if (conf.usepassDev)
+  {
+    printP(td, href_i, comillas, barra, loghtm);
+    if (autOK())
+      printP(interr, c(DISCONNECTYES), comillas, mayor, t(des));
+    else
+      printP(comillas, b, c(color000000), mayor);
+    printP(t(conectar), href_f, td_f);
+  }
+  printP(tr_f, menor, barra, table, mayor);
+  printP(menor, table, b);
+  printP(c(tclass), ig);
+  printP(tmenu, mayor, tr);  // formato menú
+  if (opcprin == 1) // PANELES
+    {
+    for (byte i=0; i<maxpaneles; i++)
+      if (getbit8(conf.bshowpanel, i))
+        printOpc(false, opcsec==i, readdescr(filezonas, i, 20), panelhtm, i);
+    }
+  else if (opcprin==2) // PROGRAMACIÓN
+    {
+    printOpc(false, opcsec==5, t(programas), sprghtm);
+    printOpc(false, opcsec==1, t(semanal), ssehtm);
+    printOpc(false, opcsec==2, t(condiciones), svhtm);
+    printOpc(false, opcsec==3, t(fecha), sfhtm);
+    printOpc(false, opcsec==4, t(escenas), seschtm);
+    printOpc(false, opcsec==7, t(webcalls), swchtm);
+    }
+  else if (opcprin==3) // CONFIGURACIÓN
+    {
+    printOpc(false, opcsec==0, t(dispositivo), sdhtm);
+    printOpc(false, opcsec==5, t(zonas), sphtm);
+    printOpc(false, opcsec==2, t(mandorf), rfhtm);
+    printOpc(false, opcsec==3, t(red), snehtm);
+    printOpc(false, opcsec==4, t(servred), snshtm);
+    printOpc(false, opcsec==1, c(senales), siohtm);
+    printOpc(false, opcsec==10, t(remotos), slkhtm);
+    printOpc(false, opcsec==11, c(salremotas), sremhtm);
+    }
+  else if (opcprin==4) // SISTEMA
+    {
+    printOpc(false, opcsec==4, t(statust), espsyshtm);
+    printOpc(false, opcsec==3, t(files), fileshtm);
+    printOpc(false, opcsec==5, t(seguridad), sshtm);
+    printOpc(false, opcsec==1, t(actualizar), suhtm);
+    printOpc(false, opcsec==2, treset, rshtm);
+    }
+  printP(tr_f, menor, barra, table, mayor, br);
+}
+
+void ICACHE_FLASH_ATTR serversend200() { server.send(200, texthtml, msg); msg=vacio; }
+void ICACHE_FLASH_ATTR printtiempo(unsigned long segundos)
+{
+  if (segundos < 60)  {
+    printIP(segundos, comillas);
+    }
+  else     {
+    unsigned long minutos = segundos / 60;
+    segundos = segundos % 60;
+    if (minutos < 60)     {
+      printIP(minutos, comilla);
+      printPiP(b, segundos, comillas);
+      }
+    else      {
+      unsigned long horas = minutos / 60;
+      minutos = minutos % 60;
+      if (horas < 24)  {
+        printIP(horas, letrah);
+        printPiP(b, minutos, comilla);
+      }
+      else          {
+        unsigned int dias = horas / 24;
+        horas = horas % 24;
+        printIP(dias, letrad);
+        printPiP(b, horas, letrah);
+        }
+      }
+    }
+}
+
 
