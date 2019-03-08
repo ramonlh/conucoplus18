@@ -256,7 +256,7 @@ ON/OFF
 URL                                     
 Firmware                                
 MAC                                     
-                                       .
+BMP085 OK                               
                                        .
                                        .
                                        .
