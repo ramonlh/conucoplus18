@@ -136,20 +136,34 @@ const byte tab[8] = {1,2,4,8,16,32,64,128}; // 8
 /********* IMPORTANTE  *****************/
 const byte valorpin[2] ={0,1};    // directo 0=LOW,  1=HIGH    
 
-////UPDATER
 int verserver=0; 
 int versinsttemp=0;
 byte actualizauttemp=0;
 const char* update_username ="admin";
 const char* update_password ="admin";
 char fwUrlBasetemp[80]="";
-////UPDATER END
-
-String msg;                     // String donde se construye la respuesta HTML qu e se envía al cliente
+char mac[14]="";                // MAC del dispositivo
+char host[16]="";
+char hostraiz[16]="192.168.";
+char conucochar[7]="conuco";
+char idmyjsontemp[10]="";
+char aliasdevicetemp[20]="";
+char ssidSTAtemp[20]="";
+char passSTAtemp[20]="";
+byte iftttenabletemp=0;  
+char iftttkeytemp[30]="";
+char admin[]="admin";
 char buff[20];                  // 20 bytes, auxiliar
 char auxchar[130];              // 130 bytes, auxiliar 
 char auxdesc[60];               // 60 bytes, auxiliar para lectura de descriptores de archivos
-//byte addr[maxTemp][8];          // 3x8, 24 bytes identificador de cada sonda DS18B20 (64)
+char unitpinAtemp[4];           // 4 char, unidades entradas analógicas
+char iottweetusertemp[10];          //IoTtweet account user ID (6 digits, included zero pre-fix)
+char iottweetkeytemp[15];           //IoTtweet account user ID (6 digits, included zero pre-fix)
+
+String msg;                     // String donde se construye la respuesta HTML qu e se envía al cliente
+String private_tweet="Mi Conuco";                  //Your private tweet meassage to dashboard
+String public_tweet="Conuco";         //Your public tweet message to dashboard
+
 int peractpantemp=10;           // 2 período de actualización automática página panel
 int peractremtemp=10;           // 2 período de actualización automática a nodo raíz
 byte bsumatAtemp[maxEA]={0};    // 1 byte,  mostrar sumaA temp
@@ -173,7 +187,6 @@ long timerem[maxdevrem];        // tiempo en minutos desde última conexión con
 boolean actirem[maxdevrem];     // 16 bytes, activo remoto
 long contaremote[maxsalrem];    // 32x4, 128 bytes, contadores o tiempo de encendido o apagado de señales remotas, en segundos
 boolean actisenal[maxsalrem];   // 32 bytes, señales remotas activas
-char unitpinAtemp[4];           // 4 char, unidades entradas analógicas
 byte evenTemp[nEVE];            // 8 define la señal sobre la que se actua, variable temporal
 byte bconactcumple[4];          // valor de cumplimiento actual de la condición
 // variables para programación SEMANAL
@@ -184,12 +197,8 @@ byte mbstatus[2];               // estado relés remotos modbus (1 bit cada uno)
 byte bstatremote[4];            // 4 bytes, estado de cada posible salida remota
 byte tipoedremote[32];          // 32 bytes, tipo de cada posible entrada digital remota, 0=ON/OFF, 1=DHT
 float sondaremote[maxsalrem];   // 128 bytes, valores de sondas remotas
-
-char mac[14]="";                // MAC del dispositivo
-
 byte bevenENABLE[2][8];         // 2x8, 16 bytes, define si la condición ha activado ya algo
-char host[16]="";
-char hostraiz[16]="192.168.";
+
 byte NumOri=0;
 boolean statusChange=false;
 byte ListOri[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -200,21 +209,14 @@ byte MbC8ant[1]={0};            // estado anterior de SD y ED: 0:SD0, 1:SD1, 2:E
 int MbR[4];                     // 0-2 Temperaturas locales, 3 analógica local
 int MbRant[4];                  // 0-2 Temperaturas locales, 3 analógica local, valores anteriore
 byte iftttchange[1]={0};
-char idmyjsontemp[10]="";
 boolean onescenaact=false;
 byte addr1Wire[maxTemp][8];
 byte secori=0;
 int tempbt2=0;
 float latitudtemp, longitudtemp;
-char conucochar[7]="conuco";
 
 byte wifimodetemp=2;     
 byte iddevicetemp=0;     
-char aliasdevicetemp[20]="";
-char ssidSTAtemp[20]="";
-char passSTAtemp[20]="";
-byte iftttenabletemp=0;  
-char iftttkeytemp[30]="";
 byte modomyjsontemp=0;
 byte mododweettemp=0;
 byte valinictemp[2]={0,0};
@@ -230,12 +232,8 @@ byte posacteve=0;
 byte posactfec=0;
 byte posactesc=0;
 byte modo45temp=0;
-char iottweetusertemp[10];          //IoTtweet account user ID (6 digits, included zero pre-fix)
-char iottweetkeytemp[15];           //IoTtweet account user ID (6 digits, included zero pre-fix)
 byte iottweetenabletemp=0;
 long modbusbaud=19200;
-String private_tweet="Mi Conuco";                  //Your private tweet meassage to dashboard
-String public_tweet="Conuco";         //Your public tweet message to dashboard
 byte lastpro=0;
 long lastcode=0;
 int lastlen=0;
@@ -249,8 +247,6 @@ long lastReconnectAttempt=0;
 boolean pendsave = false;
 boolean bmp085enabled=false;
 conucodata datosremoto;
-
-char admin[]="admin";
 
 boolean filesok=false;
 char fileconf[]="/conf.txt";
@@ -273,7 +269,6 @@ char filespanish[]="/spanish.txt";
 char fileenglish[]="/english.txt";
 char filelog[]="/log.txt";
 
-int testvalue=0;
 //////////////  BMP085
 //const unsigned char OSS=0;  // Oversampling Setting
 //// Calibration values

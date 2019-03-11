@@ -4089,15 +4089,21 @@ void ICACHE_FLASH_ATTR mqttpublish(byte i)
 
 void mqttcallback(char* topic, byte* payload, unsigned int length) 
 {
-  printhora();
   int auxb=mqttextraepin(topic,"set");
-  if ((auxb>=6) && (auxb<=7))
+  if ((auxb>=0) && (auxb<=2))     // consignas
+    {
+    msg=vacio;
+    for (byte j=0; j<length;j++) msg+=(char)payload[j];
+    conf.setpoint[auxb]=msg.toFloat();  
+    }
+  else if ((auxb>=6) && (auxb<=7))  // salidas relé
     {
     if ((char)payload[0]=='0') { pinVAL(auxb+6,0,0); }
     if ((char)payload[0]=='1') { pinVAL(auxb+6,1,0); }
     }
   auxb=mqttextraepin(topic,"state");
   if ((auxb>=0) && (auxb<=7)) { mqttpublish(auxb); }
+  msg=vacio;
 }
 
 boolean ICACHE_FLASH_ATTR mqttreconnect() 
@@ -4111,20 +4117,7 @@ boolean ICACHE_FLASH_ATTR mqttreconnect()
 
 void ICACHE_FLASH_ATTR mqttpublishvalues()
 {
-  for (byte i=0;i<8;i++)
-    if (getbit8(conf.mqttsalenable,i))
-      {
-      mqttpublish(i);
-//      strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
-//      for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
-//      strcat(auxdesc,idpin[i]);
-//      if (i<=2) { strcpy(auxchar,ftoa(MbR[i]));  }
-//      else if (i==3) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
-//      else if (i<=5) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-2),buff,10));  }
-//      else if (i<=7) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-6),buff,10));  }
-//      PSclient.publish(auxdesc, auxchar);
-//      strcpy(auxdesc,"");strcpy(auxchar,"");
-      }
+  for (byte i=0;i<8;i++) if (getbit8(conf.mqttsalenable,i)) { mqttpublish(i); }
 }
 
 void ICACHE_FLASH_ATTR mqttsubscribe(char* topic)
@@ -4143,7 +4136,7 @@ void ICACHE_FLASH_ATTR mqttsubscribevalues()
       strcat(auxdesc,idpin[i]);
       strcat(auxdesc,"/state");
       PSclient.subscribe(auxdesc);
-      if (i>=6)
+      if ((i<=2) || (i>=6))
         {
         strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
         for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
