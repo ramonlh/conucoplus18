@@ -118,5 +118,5 @@ void serialprintParESP()
 
 void initupdateserver()
 {
-  httpUpdater.setup(&server,"/firm", update_username, update_password);
+  httpUpdater.setup(&server,"/firm", conf.userDev, conf.passDev);
 }

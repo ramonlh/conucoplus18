@@ -642,7 +642,7 @@ void ICACHE_FLASH_ATTR panelHTML() {
 
   for (byte i=0; i<maxsalrem; i++) // TEMPERATURAS DS18B20 remotas
   {
-    if (getbit8(conf.bshowbypanel[auxI], i + 8))
+    if (getbit8(conf.bshowbypanel[auxI], i+8))
       {
       if ((conf.idsalremote[i] >= 150) && (conf.idsalremote[i] <= 166) && (conf.senalrem[i] <= 2)) // remoto conuco
         {
@@ -661,13 +661,13 @@ void ICACHE_FLASH_ATTR panelHTML() {
 
   // ENTRADA ANALÓGICA
   if (getbit8(conf.bshowbypanel[auxI], 3))
-  {
+    {
     printP(tr, td);
     if (conf.showN) printparentesis(letraa, 0);
     printP(readdescr(filedesclocal, 3, 20), td_f, td);
     printF((MbR[baseAna]*conf.factorA[0]) + conf.offsetA[0], 2);
     printP(b, conf.unitpinA, td_f, tr_f);
-  }
+    }
   for (byte i=0; i<maxsalrem; i++) // entrada analógica remota
     if (getbit8(conf.bshowbypanel[auxI], i + 8))
       if (conf.senalrem[i] == 3)
@@ -1296,7 +1296,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
 
   printP(tr);
   tcell(descripcion);
-  printColspan(2);
+  printP(td);
   printP(c(mqtt),td_f);
   tcell(consigna);
   tcell(salida);
@@ -1323,7 +1323,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printP(td_f);
 
         checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)),true);
-        printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
+//        printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
 
         printP(td);
         printcampoF(mpi+1, conf.setpoint[i], 1); // valor de consigna
@@ -1383,7 +1383,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printOpc(false, false, auxdesc);
 
         cell(getbit8(conf.mqttsalenable,i)?symyes:symnot);
-        cell(conf.tempmqtt[i]);
+//        cell(conf.tempmqtt[i]);
         cell(conf.setpoint[i],2);
         printP(td); 
         if (conf.salsetpoint[i]<2)       printP(readdescr(filedesclocal,conf.salsetpoint[i]+6,20));  
@@ -1398,7 +1398,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
     if (i==3) // entrada analógica
       {
       printP(tr);
-      printColspan(3);
+      printColspan(2);
       tcell(units);
       ccell(factor);
       ccell(toffset);
@@ -1420,7 +1420,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
 
         checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)),true);
         
-        printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
+//        printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
 
         printP(td,menor, c(tinput), b, type, ig);
         printP(comillas, c(ttext), comillas, b);
@@ -1447,7 +1447,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printOpc(false, false, auxdesc);
 
         cell(getbit8(conf.mqttsalenable,i)?symyes:symnot);
-        cell(conf.tempmqtt[i]);
+//        cell(conf.tempmqtt[i]);
         
         cell(conf.unitpinA);
         printP(td);
@@ -1463,7 +1463,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
       if (i==4)
         {
         printP(tr);
-        printColspan(3);
+        printColspan(2);
         tcell(ttipo);
         printColspan(2); printP(td_f);
         ccell(ifttt);
@@ -1487,7 +1487,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
           printP(td_f);
   
           checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)),true);
-          printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
+//          printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
         
           printcampoCB(mpi+1, conf.tipoED[i-4], ONOFF, OFFON, dhtt,true);
           printColspan(2);
@@ -1503,7 +1503,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
           printOpc(false, false, auxdesc);
   
           cell(getbit8(conf.mqttsalenable,i)?symyes:symnot);
-          cell(conf.tempmqtt[i]);
+//          cell(conf.tempmqtt[i]);
         
           cell(conf.tipoED[i-4]==0?ONOFF:conf.tipoED[i-4]==1?OFFON:dhtt);
           printColspan(2);
@@ -1518,7 +1518,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
       if (i==6)
         {
         printP(tr);
-        printColspan(3);
+        printColspan(2);
         ccell(defaultt);
         ccell(tdefact);
         ccell(tdefdes);
@@ -1540,7 +1540,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printP(td_f);
   
         checkBox(mpi+6,(getbit8(conf.mqttsalenable,i)),true);
-        printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
+//        printcampoI(mpi+7,conf.tempmqtt[i],5,true,true);
         
         printcampoCB(mpi+1, conf.valinic[i-6], OFF, ON, ultimovalor,true);
         printcampoL(mpi+2, conf.tempdefact[i-6], 8, true,true);
@@ -1557,7 +1557,7 @@ void ICACHE_FLASH_ATTR setupioHTML()
         printOpc(false, false, auxdesc);
   
         cell(getbit8(conf.mqttsalenable,i)?symyes:symnot);
-        cell(conf.tempmqtt[i]);
+//        cell(conf.tempmqtt[i]);
         
         cell(conf.valinic[i-6]==0?OFF : conf.valinic[i - 6] == 1 ? ON : ultimovalor);
         cell(conf.tempdefact[i-6]);
@@ -4065,7 +4065,7 @@ int ICACHE_FLASH_ATTR mqttextraepin(char* topic, String command)
   for (byte i=0;i<strlen(topic);i++) msg+=topic[i];
   String auxS="";
   byte i=0; boolean encontrado=false;
-  while ((i<8) && (!encontrado))
+  while ((i<11) && (!encontrado))
     {
     auxS="/"; for (byte j=0;j<strlen(idpin[i]);j++) auxS+=idpin[i][j]; auxS+="/"; auxS+=command;
     encontrado=(msg.indexOf(auxS)>0);
@@ -4083,13 +4083,19 @@ void ICACHE_FLASH_ATTR mqttpublish(byte i)
     else if (i==3) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
     else if (i<=5) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-2),buff,10));  }
     else if (i<=7) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-6),buff,10));  }
+    else if (i==8) { strcpy(auxchar,itoa(conf.iddevice,buff,10));  }   // iddevice
+    else if (i==9) {  // IP privada 
+      strcat(auxchar,itoa(WiFi.localIP()[0],buff,10));
+      for (byte j=1;j<4;j++) { strcat(auxchar,"."); strcat(auxchar,itoa(WiFi.localIP()[j],buff,10)); }     }
+    else if (i==10) { strcpy(auxchar,conf.myippub);  }  // IP pública
     PSclient.publish(auxdesc, auxchar);
     strcpy(auxdesc,"");strcpy(auxchar,"");
 }
 
 void mqttcallback(char* topic, byte* payload, unsigned int length) 
 {
-  int auxb=mqttextraepin(topic,"set");
+  // set
+  int auxb=mqttextraepin(topic,"set");    // SET
   if ((auxb>=0) && (auxb<=2))     // consignas
     {
     msg=vacio;
@@ -4101,8 +4107,9 @@ void mqttcallback(char* topic, byte* payload, unsigned int length)
     if ((char)payload[0]=='0') { pinVAL(auxb+6,0,0); }
     if ((char)payload[0]=='1') { pinVAL(auxb+6,1,0); }
     }
-  auxb=mqttextraepin(topic,"state");
-  if ((auxb>=0) && (auxb<=7)) { mqttpublish(auxb); }
+  // state
+  auxb=mqttextraepin(topic,"state");    // STATE
+  if ((auxb>=0) && (auxb<=10)) { mqttpublish(auxb); }
   msg=vacio;
 }
 
@@ -4118,6 +4125,7 @@ boolean ICACHE_FLASH_ATTR mqttreconnect()
 void ICACHE_FLASH_ATTR mqttpublishvalues()
 {
   for (byte i=0;i<8;i++) if (getbit8(conf.mqttsalenable,i)) { mqttpublish(i); }
+  for (byte i=8;i<11;i++) { mqttpublish(i); }
 }
 
 void ICACHE_FLASH_ATTR mqttsubscribe(char* topic)
@@ -4128,14 +4136,15 @@ void ICACHE_FLASH_ATTR mqttsubscribe(char* topic)
 void ICACHE_FLASH_ATTR mqttsubscribevalues()
 {
   long tini=millis();
-  for (byte i=0;i<8;i++)
-    if (getbit8(conf.mqttsalenable,i))
+  for (byte i=0;i<11;i++)
+    if (((i>=8) && (i<=10)) || (getbit8(conf.mqttsalenable,i)))
       {
       strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
       for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
       strcat(auxdesc,idpin[i]);
       strcat(auxdesc,"/state");
       PSclient.subscribe(auxdesc);
+      
       if ((i<=2) || (i>=6))
         {
         strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");

@@ -111,9 +111,9 @@ typedef struct {    // datos configuración
                 byte MbC8[1]={0};                 // estado de ED y SD: 0:SD0, 1:SD1, 2:ED0, 3:ED1
                 byte ftpenable=1;                 // 0=disnable, 1=enable
                 byte lang=0;                      // 0=español, 1=inglés
-                byte mqttenable=0;                // desactiva MQTT
-                char mqttserver[40]="";           // MQTT broker
-                char mqttpath[6][10]={"","","","","",""};             // MQTT path
+                byte mqttenable=1;                // activado MQTT por defecto 
+                char mqttserver[40]="broker.mqtt-dashboard.com";           // MQTT broker por defecto
+                char mqttpath[6][10]={"conuco","INSTAL","150","","",""};   // MQTT path por defecto
                 char instname[10]="INSTAL";       // nombre de la instalación
                 unsigned int tempmqtt[8]={0,0,0,0,0,0,0,0};  // período de envío mqtt para cada señal
                } conftype;
@@ -129,7 +129,7 @@ byte rx433=2;              // en el Wemos D1 Mini se usa el 2 para el LED
 byte ledSt=15;             // Led estado Wemos=2, Electrodragon=16
 byte tx433=15;             // NO USADO 
 byte bt2Pin=0;             // botón 2
-const char idpin[8][4]={"t0","t1","t2","a0","e0","e1","s0","s1"};
+const char idpin[11][4]={"t0","t1","t2","a0","e0","e1","s0","s1","id","ip","ipp"}; // hasta el 8 son pines.
 //////  tratamiento de bits /////////////////////
 const byte tab[8] = {1,2,4,8,16,32,64,128}; // 8
 
@@ -139,8 +139,6 @@ const byte valorpin[2] ={0,1};    // directo 0=LOW,  1=HIGH
 int verserver=0; 
 int versinsttemp=0;
 byte actualizauttemp=0;
-const char* update_username ="admin";
-const char* update_password ="admin";
 char fwUrlBasetemp[80]="";
 char mac[14]="";                // MAC del dispositivo
 char host[16]="";
@@ -268,6 +266,8 @@ char filecommon[]="/common.txt";
 char filespanish[]="/spanish.txt";
 char fileenglish[]="/english.txt";
 char filelog[]="/log.txt";
+
+unsigned long tini=0;
 
 //////////////  BMP085
 //const unsigned char OSS=0;  // Oversampling Setting
