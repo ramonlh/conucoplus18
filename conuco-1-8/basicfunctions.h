@@ -137,11 +137,11 @@ String ICACHE_FLASH_ATTR extrae(boolean eschar, String cad, String subcad)
   { subcad.concat("\"");
     return cad.substring(cad.indexOf(subcad)+subcad.length()+(eschar?2:1), cad.indexOf(",",cad.indexOf(subcad))-(eschar?1:0));      }
 
-char* ICACHE_FLASH_ATTR ftoa(int valor)
+char* ICACHE_FLASH_ATTR ftoa(int valor, int dec)
 {  
   char buff1[10],buff2[10];
-  itoa(valor/100,buff1,10);
-  itoa(valor%100,buff2,10);
+  itoa(valor/10,buff1,10);
+  itoa(valor%10,buff2,10);
   strcat(buff1,".");
   strcat(buff1,buff2);
   return buff1;

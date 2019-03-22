@@ -129,7 +129,7 @@ byte rx433=2;              // en el Wemos D1 Mini se usa el 2 para el LED
 byte ledSt=15;             // Led estado Wemos=2, Electrodragon=16
 byte tx433=15;             // NO USADO 
 byte bt2Pin=0;             // botón 2
-const char idpin[11][4]={"t0","t1","t2","a0","e0","e1","s0","s1","id","ip","ipp"}; // hasta el 8 son pines.
+const char idpin[15][4]={"t0","t1","t2","a0","e0","e1","s0","s1","id","ip","ipp","c0","c1","c2","all"}; // hasta el 8 son pines.
 //////  tratamiento de bits /////////////////////
 const byte tab[8] = {1,2,4,8,16,32,64,128}; // 8
 

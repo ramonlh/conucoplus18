@@ -1,3 +1,144 @@
+void ICACHE_FLASH_ATTR mqttpublish(byte i)
+{
+  strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
+  for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
+  strcat(auxdesc,idpin[i]);
+  if (i<=2) { strcpy(auxchar,ftoa(MbR[i]/10,1));  }
+  else if (i==3) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
+  else if (i<=5) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-2),buff,10));  }
+  else if (i<=7) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-6),buff,10));  }
+  else if (i==8) { strcpy(auxchar,itoa(conf.iddevice,buff,10));  }   // iddevice
+  else if (i==9) {  // IP privada 
+    strcat(auxchar,itoa(WiFi.localIP()[0],buff,10));
+    for (byte j=1;j<4;j++) { strcat(auxchar,"."); strcat(auxchar,itoa(WiFi.localIP()[j],buff,10)); }     }
+  else if (i==10) { strcpy(auxchar,conf.myippub);  }  // IP pública
+  else if ((i>=11)&&(i<=13)) { strcpy(auxchar,ftoa(conf.setpoint[i-11]*10,1));  }  // consignas
+  Serial.print("T topic:"); Serial.print(auxdesc);
+  Serial.print(" data:"); Serial.println(auxchar);
+  PSclient.publish(auxdesc, auxchar);
+  strcpy(auxdesc,"");strcpy(auxchar,"");
+}
+
+void ICACHE_FLASH_ATTR pinVAL(byte n, byte value, byte ori)
+{
+  if ((n==sdPin[0]) || (n==sdPin[1]))
+    if (getbit8(conf.MbC8,n-12)!=value)
+      {
+      digitalWrite(n, valorpin[value]);
+      setbit8(conf.MbC8,n-12,value);
+      setbit8(MbC8ant,n-12,value);
+      saveconf();
+      if (value) tempact[n-sdPin[0]]=millis()/1000;
+      else tempdes[n-sdPin[0]]=millis()/1000;
+      setbit8(iftttchange, n-12,1);
+      if (ori==conf.iddevice) 
+        {
+        statusChange=true;
+        mqttpublish(n-6);
+        }
+      }
+}
+
+int ICACHE_FLASH_ATTR pinvalR(byte ip, int port, byte pin, byte valor) // ejecuta comando remoto
+{
+  
+  createhost(ip);
+  msg=vacio;
+  printP(barra, valor?on:off, interr, letrap, ig, itoa(pin+12,buff,10));
+  printP(amper, letrar, ig, itoa(conf.iddevice, buff, 10));
+  return callhttpGET(host,port,false,conf.timeoutrem);
+}
+
+int ICACHE_FLASH_ATTR mqttextraepin(char* topic, String command)
+{
+  msg="";
+  for (byte i=0;i<strlen(topic);i++) msg+=topic[i];
+  String auxS="";
+  byte i=0; boolean encontrado=false;
+  while ((i<15) && (!encontrado))
+    {
+    auxS="/"; for (byte j=0;j<strlen(idpin[i]);j++) auxS+=idpin[i][j]; auxS+="/"; auxS+=command;
+    encontrado=(msg.indexOf(auxS)>0);
+    if (!encontrado) i++;
+    }
+  return encontrado?i:-1;
+}
+
+void ICACHE_FLASH_ATTR mqttpublishallvalues()  { for (byte i=0;i<14;i++) mqttpublish(i); }
+
+void mqttcallback(char* topic, byte* payload, unsigned int length) 
+{
+  Serial.print("R topic:"); Serial.print(topic);
+  Serial.print(" data:"); 
+  for (byte i=0;i<length;i++) Serial.print((char)payload[i]);
+  Serial.println();
+  int auxb=mqttextraepin(topic,"set");     // tratamiento de "set"
+  Serial.print("set:"); Serial.println(auxb);
+  if ((auxb>=6) && (auxb<=7))  // salidas relé
+    {
+    if ((char)payload[0]=='0') { pinVAL(auxb+6,0,0); }
+    if ((char)payload[0]=='1') { pinVAL(auxb+6,1,0); }
+    }
+  else if ((auxb>=0) && (auxb<=2))     // consigna
+    {
+    msg=vacio;
+    for (byte j=0; j<length;j++) msg+=(char)payload[j];
+    conf.setpoint[auxb]=msg.toFloat(); 
+    saveconf(); 
+    mqttpublish(auxb);
+    mqttpublish(auxb+11);
+    }
+  else if ((auxb>=11) && (auxb<=13))     // consigna
+    {
+    msg=vacio;
+    for (byte j=0; j<length;j++) msg+=(char)payload[j];
+    conf.setpoint[auxb-11]=msg.toFloat();  
+    saveconf(); 
+    mqttpublish(auxb-11);
+    mqttpublish(auxb);
+    }
+  ////////////////////////////////////////
+  auxb=mqttextraepin(topic,"state");      // tratamiento de "state"
+  Serial.print("state:"); Serial.println(auxb);
+  if ((auxb>=0) && (auxb<=13)) { mqttpublish(auxb); }
+  else if (auxb==14) { mqttpublishallvalues(); }
+  msg=vacio;
+}
+
+boolean ICACHE_FLASH_ATTR mqttreconnect() 
+  { 
+  String clientID="conuco-";
+  for (byte i=0;i<6;i++) clientID += conf.EEmac[i];
+  if (PSclient.connect(clientID.c_str())) 
+    { PSclient.publish("conuco/g","conectado"); }
+  return PSclient.connected(); 
+  }
+
+void ICACHE_FLASH_ATTR mqttsubscribe(char* topic)
+{
+  PSclient.subscribe(topic);
+}
+
+void ICACHE_FLASH_ATTR mqttsubscribevalues()
+{
+  long tini=millis();
+  for (byte i=0;i<15;i++)   // subscribe "state" para todos los valores
+    {
+    strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
+    for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
+    strcat(auxdesc,idpin[i]);
+    strcat(auxdesc,"/state");
+    PSclient.subscribe(auxdesc);
+    
+    strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
+    for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
+    strcat(auxdesc,idpin[i]);
+    strcat(auxdesc,"/set");
+    PSclient.subscribe(auxdesc);
+    }
+  strcpy(auxdesc,"");
+}
+
 
 void ICACHE_FLASH_ATTR testTX433()
 {
@@ -24,6 +165,7 @@ void ICACHE_FLASH_ATTR leevaloresDIG()
         {
         setbit8(iftttchange,i+2,1);   
         if (getbit8(conf.MbC8,i+2)==1) conf.contadores[i]++;  
+        mqttpublish(i+4);
         }
       }
     MbC8ant[0]=conf.MbC8[0];
@@ -153,32 +295,6 @@ int ICACHE_FLASH_ATTR ifttttrigger(char *evento, char* key, char* value1, char* 
   return httpCode;
 }
 //////////////////  END IFTTT  ///////////////////
-
-void ICACHE_FLASH_ATTR pinVAL(byte n, byte value, byte ori)
-{
-  if ((n==sdPin[0]) || (n==sdPin[1]))
-    if (getbit8(conf.MbC8,n-12)!=value)
-      {
-      digitalWrite(n, valorpin[value]);
-      setbit8(conf.MbC8,n-12,value);
-      setbit8(MbC8ant,n-12,value);
-      saveconf();
-      if (value) tempact[n-sdPin[0]]=millis()/1000;
-      else tempdes[n-sdPin[0]]=millis()/1000;
-      setbit8(iftttchange, n-12,1);
-      if (ori==conf.iddevice) statusChange=true;
-      }
-}
-
-int ICACHE_FLASH_ATTR pinvalR(byte ip, int port, byte pin, byte valor) // ejecuta comando remoto
-{
-  
-  createhost(ip);
-  msg=vacio;
-  printP(barra, valor?on:off, interr, letrap, ig, itoa(pin+12,buff,10));
-  printP(amper, letrar, ig, itoa(conf.iddevice, buff, 10));
-  return callhttpGET(host,port,false,conf.timeoutrem);
-}
 
 int ICACHE_FLASH_ATTR getMyIP()
 {
@@ -630,13 +746,15 @@ void ICACHE_FLASH_ATTR panelHTML() {
     }
 
   // TEMPERATURAS DS18B20 locales
-  for (byte i = 0; i < maxTemp; i++)
+  for (byte i=0; i<maxTemp; i++)
     if (getbit8(conf.bshowbypanel[auxI], i))
       {
       printP(tr,td);
       if (conf.showN) { printparentesis(letraS, i + 1);  for (byte j = 0; j < 8; j++) printH(addr1Wire[i][j]);   }
       printP(b, readdescr(filedesclocal,i,20), td_f, td);
-      printF(MbR[i]*0.01,2);
+      printF(MbR[i]*0.01,1);
+      printP(b,barra,b);
+      printF(conf.setpoint[i],1);
       printP(b, celsius, td_f, tr_f);
       }
 
@@ -653,7 +771,7 @@ void ICACHE_FLASH_ATTR panelHTML() {
         }
         printP(b, readdescr(filesalrem, i, 20), td_f, td);
         if (!actisenal[i]) printP(aster, b);
-        printF(sondaremote[i], 2);
+        printF(sondaremote[i], 1);
         printP(b, celsius, td_f, tr_f);
         }
       }
@@ -3666,7 +3784,7 @@ void ICACHE_FLASH_ATTR setupEscHTML()
   serversend200();
 }
 
-void ICACHE_FLASH_ATTR initWiFi(void)
+void ICACHE_FLASH_ATTR reinitWiFi(void)
 {
   dPrint(t(reiniciando)); dPrint(b); dPrint(c(twifi)); dPrint(crlf);
   conf.wifimode = 1;                  // AP
@@ -3775,7 +3893,7 @@ void ICACHE_FLASH_ATTR initFab(void)
 {
   dPrint(t(reiniciando)); dPrint(b); dPrint(t(fabrica)); dPrint(crlf);
   initConf();                  // variables de estructura Conf
-  initWiFi();                  // WiFi y Red
+  reinitWiFi();                // WiFi y Red
   initPRG();                   // PROGRAMAS
   saveconf();
 }
@@ -3800,7 +3918,7 @@ void ICACHE_FLASH_ATTR resetHTML()
           server.send(200, "text/html", espere);
           if (idaccion==1)      { ESP.restart(); }
           else if (idaccion==2) { ESP.restart(); }
-          else if (idaccion==3) { initWiFi();  }
+          else if (idaccion==3) { reinitWiFi();  }
           else if (idaccion==4) { initFab(); ESP.restart(); }
           }
         }
@@ -4057,104 +4175,6 @@ void ICACHE_FLASH_ATTR lcdshowconf(boolean editing)
   else if (paract == 13) { lcd.print(t(canal)); lcd.setCursor(0,1); lcd.print(conf.canalAP); }
   else if (paract == 14) { lcd.print(c(MAC)); lcd.setCursor(0,1); lcd.print(mac); }
   else if (paract == 15) { lcd.print(c(watermarkt)); lcd.setCursor(0,1); lcd.print(conf.watermark); }
-}
-
-int ICACHE_FLASH_ATTR mqttextraepin(char* topic, String command)
-{
-  msg="";
-  for (byte i=0;i<strlen(topic);i++) msg+=topic[i];
-  String auxS="";
-  byte i=0; boolean encontrado=false;
-  while ((i<11) && (!encontrado))
-    {
-    auxS="/"; for (byte j=0;j<strlen(idpin[i]);j++) auxS+=idpin[i][j]; auxS+="/"; auxS+=command;
-    encontrado=(msg.indexOf(auxS)>0);
-    if (!encontrado) i++;
-    }
-  return encontrado?i:-1;
-}
-
-void ICACHE_FLASH_ATTR mqttpublish(byte i)
-{
-    strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
-    for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
-    strcat(auxdesc,idpin[i]);
-    if (i<=2) { strcpy(auxchar,ftoa(MbR[i]));  }
-    else if (i==3) { strcpy(auxchar,itoa(MbR[i],buff,10));  }
-    else if (i<=5) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-2),buff,10));  }
-    else if (i<=7) { strcpy(auxchar,itoa(getbit8(conf.MbC8,i-6),buff,10));  }
-    else if (i==8) { strcpy(auxchar,itoa(conf.iddevice,buff,10));  }   // iddevice
-    else if (i==9) {  // IP privada 
-      strcat(auxchar,itoa(WiFi.localIP()[0],buff,10));
-      for (byte j=1;j<4;j++) { strcat(auxchar,"."); strcat(auxchar,itoa(WiFi.localIP()[j],buff,10)); }     }
-    else if (i==10) { strcpy(auxchar,conf.myippub);  }  // IP pública
-    PSclient.publish(auxdesc, auxchar);
-    strcpy(auxdesc,"");strcpy(auxchar,"");
-}
-
-void mqttcallback(char* topic, byte* payload, unsigned int length) 
-{
-  // set
-  int auxb=mqttextraepin(topic,"set");    // SET
-  if ((auxb>=0) && (auxb<=2))     // consignas
-    {
-    msg=vacio;
-    for (byte j=0; j<length;j++) msg+=(char)payload[j];
-    conf.setpoint[auxb]=msg.toFloat();  
-    }
-  else if ((auxb>=6) && (auxb<=7))  // salidas relé
-    {
-    if ((char)payload[0]=='0') { pinVAL(auxb+6,0,0); }
-    if ((char)payload[0]=='1') { pinVAL(auxb+6,1,0); }
-    }
-  // state
-  auxb=mqttextraepin(topic,"state");    // STATE
-  if ((auxb>=0) && (auxb<=10)) { mqttpublish(auxb); }
-  msg=vacio;
-}
-
-boolean ICACHE_FLASH_ATTR mqttreconnect() 
-  { 
-  String clientID="conuco-";
-  for (byte i=0;i<6;i++) clientID += conf.EEmac[i];
-  if (PSclient.connect(clientID.c_str())) 
-    { PSclient.publish("conuco/g","conectado"); }
-  return PSclient.connected(); 
-  }
-
-void ICACHE_FLASH_ATTR mqttpublishvalues()
-{
-  for (byte i=0;i<8;i++) if (getbit8(conf.mqttsalenable,i)) { mqttpublish(i); }
-  for (byte i=8;i<11;i++) { mqttpublish(i); }
-}
-
-void ICACHE_FLASH_ATTR mqttsubscribe(char* topic)
-{
-  PSclient.subscribe(topic);
-}
-
-void ICACHE_FLASH_ATTR mqttsubscribevalues()
-{
-  long tini=millis();
-  for (byte i=0;i<11;i++)
-    if (((i>=8) && (i<=10)) || (getbit8(conf.mqttsalenable,i)))
-      {
-      strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
-      for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
-      strcat(auxdesc,idpin[i]);
-      strcat(auxdesc,"/state");
-      PSclient.subscribe(auxdesc);
-      
-      if ((i<=2) || (i>=6))
-        {
-        strcpy(auxdesc,conf.mqttpath[0]); strcat(auxdesc,"/");
-        for (byte j=1;j<6;j++) { if (strlen(conf.mqttpath[j])>0) {  strcat(auxdesc,conf.mqttpath[j]); strcat(auxdesc,"/"); } }
-        strcat(auxdesc,idpin[i]);
-        strcat(auxdesc,"/set");
-        PSclient.subscribe(auxdesc);
-        }
-      }
-  strcpy(auxdesc,"");
 }
 
 void ICACHE_FLASH_ATTR procesaSemanal()
